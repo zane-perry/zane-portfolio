@@ -1,0 +1,372 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+/* Global hero sizing so other elements (main) can read it */
+:root {
+  --hero-height: 16rem; /* slightly taller than h-48 (was 12rem) */
+  --hero-gap: 1rem; /* visible gap between hero and content (reduced) */
+}
+
+/* Navigation height (header). Tune if your header height differs. */
+:root {
+  --nav-height: 3.25rem; /* tune to actual header height so hero sits higher */
+}
+
+body {
+  @apply bg-background text-slate-900 antialiased;
+  margin: 0; /* ensure no browser default margin pushes layout */
+}
+
+/* Gradient variables for dynamic accent (teal → purple) */
+:root {
+  --g1: #14b8a6; /* teal */
+  --g2: #8b5cf6; /* purple */
+  --accent-gradient: linear-gradient(90deg, var(--g1), var(--g2));
+}
+
+/* Color variables for accent-focused components */
+:root {
+  --accent: #14b8a6; /* teal */
+  --accent-light: #7dd3c6;
+  --accent-50: #e6fffb;
+}
+
+main {
+  @apply min-h-screen;
+}
+
+.section {
+  @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
+}
+
+.section-title {
+  @apply text-2xl sm:text-3xl font-semibold mb-4;
+}
+
+.section-subtitle {
+  @apply text-sm text-gray-400 mb-8 max-w-2xl;
+}
+
+.card {
+  @apply rounded-2xl bg-surface p-5 shadow-sm text-slate-800;
+  /* create a gradient border using layered backgrounds
+     - inner layer: white (card body)
+     - outer layer: gradient (used as border) */
+  border: 2px solid transparent;
+  /* use a slightly darker very light gray for the card body so it stands
+    out a bit more from the white page background */
+  /* layered backgrounds: base card body, accent gradient border layer */
+  background-image: linear-gradient(#f1f5f9, #f1f5f9), var(--accent-gradient);
+  /* slightly stronger but still subtle shadow for better separation */
+  box-shadow: 0 10px 30px rgba(2,6,23,0.08);
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* animated gradient movement on hover: the second background layer (accent) will move */
+.card {
+  /* make second layer larger so movement is visible */
+  background-size: 100% 100%, 200% 200%;
+  /* start the accent gradient at the top center so rotation feels natural */
+  background-position: center, 50% 0%;
+}
+
+.card:hover {
+  /* start a faster, continuous rotation-like movement while hovered */
+  /* reduced from 8s to 3.6s for a visibly quicker effect */
+  animation: card-gradient-move 3.6s linear infinite;
+}
+
+@keyframes card-gradient-move {
+  /* approximate a circular path around the card by moving the
+     background-position of the second layer through points on a circle */
+  0%   { background-position: center, 50% 0%; }
+  12.5%{ background-position: center, 85% 15%; }
+  25%  { background-position: center, 100% 50%; }
+  37.5%{ background-position: center, 85% 85%; }
+  50%  { background-position: center, 50% 100%; }
+  62.5%{ background-position: center, 15% 85%; }
+  75%  { background-position: center, 0% 50%; }
+  87.5%{ background-position: center, 15% 15%; }
+  100% { background-position: center, 50% 0%; }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .card:hover {
+    animation: none !important;
+    transition: box-shadow 220ms ease, transform 220ms ease;
+  }
+}
+
+/* Enable smooth GPU-accelerated transform transitions for tilt effect */
+.card {
+  transform-style: preserve-3d;
+  transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease;
+}
+
+/* Explicit fallbacks (ensure immediate bright background even if tailwind output is stale) */
+body {
+  background-color: #ffffff;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.card {
+  /* subtle light-gray card background so cards read as elevated panels */
+  background-color: #f1f5f9;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.08);
+  color: #0f172a;
+}
+
+.section-subtitle {
+  color: #64748b; /* slate-500 fallback */
+}
+
+header.site-nav {
+  /* semi-transparent accent gradient so hero peeks through; keep high contrast */
+  background: linear-gradient(90deg, rgba(20,184,166,0.85), rgba(139,92,246,0.85));
+  color: white;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  /* subtle glass effect where supported */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  /* small subtle shadow to separate nav from content when needed */
+  box-shadow: 0 2px 8px rgba(2,6,23,0.04);
+}
+
+/* ensure links in the nav remain highly legible */
+header.site-nav a,
+header.site-nav .nav-link {
+  color: #ffffff;
+  text-decoration: none;
+}
+header.site-nav a:hover,
+header.site-nav .nav-link:hover,
+header.site-nav a:focus,
+header.site-nav .nav-link:focus {
+  text-decoration: underline;
+}
+
+/* faint text-shadow for nav items to improve contrast on busy hero images */
+header.site-nav a,
+header.site-nav .nav-link,
+header.site-nav .brand {
+  text-shadow: 0 1px 2px rgba(2,6,23,0.45);
+}
+
+/* Make the brand highly legible over the semi-transparent nav */
+header.site-nav .brand {
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Small configurable gap so part of the hero remains visible before scrolling */
+:root {
+  --hero-gap: 2rem; /* adjust as needed */
+}
+
+.hero-banner {
+  /* keep the hero in the document flow; place it at the very top so
+     no empty whitespace appears above it. The header will sit above
+     the hero (sticky) and may overlap the top portion of the image. */
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  width: 100%;
+  height: var(--hero-height);
+  z-index: 10; /* beneath header, under content */
+}
+
+.hero-banner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center; /* show the middle of the image */
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to bottom, rgba(20,184,166,0.18), rgba(139,92,246,0.06));
+}
+
+.hero-overlay h1,
+.hero-overlay p {
+  text-shadow: 0 1px 6px rgba(2,6,23,0.6);
+}
+
+/* Content area immediately below the hero
+   - ensures readable text on white background
+   - provides a subtle rounded top and shadow for separation */
+.content-area {
+  background-color: #ffffff;
+  /* keep content visually below the hero */
+  margin-top: 0;
+  box-shadow: 0 -8px 30px rgba(2,6,23,0.06);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  position: relative;
+  z-index: 20; /* sit above the fixed hero */
+}
+
+/* For very small screens reduce the radius to keep it subtle */
+@media (max-width: 640px) {
+  .content-area {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+}
+
+/* responsive hero height to match Tailwind h-48 / h-64 / h-72 */
+@media (min-width: 640px) {
+  :root {
+    --hero-height: 17rem; /* slightly taller than sm h-64 (was 16rem) */
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --hero-height: 25rem; /* slightly taller than md h-72 (was 18rem) */
+  }
+}
+
+/* Ensure header (NavBar) stays above the hero and content */
+header.site-nav {
+  /* keep the nav sticky at the top and above the hero */
+  position: sticky;
+  top: 0;
+  z-index: 60;
+}
+
+/* Ensure the page content initially sits below the fixed hero */
+main {
+  /* hero is in the flow (sticky), so no extra padding is required here */
+  padding-top: 0;
+}
+
+/* Projects expanding-card animation styles */
+.projects-faded > *:not(.expanding-overlay) {
+  opacity: 0.08;
+  transform: scale(0.98);
+  transition: opacity 320ms ease, transform 320ms ease;
+}
+
+.card-dim {
+  opacity: 0.08;
+  transform: scale(0.98);
+}
+
+.projects-overlay-container {
+  position: fixed;
+  inset: 0;
+  /* allow the container to receive clicks so we can detect outside clicks;
+     the expanding overlay still accepts pointer events itself */
+  pointer-events: auto;
+  /* subtle backdrop to indicate modal state and provide a click target */
+  background: rgba(2,6,23,0.18);
+}
+
+.expanding-overlay {
+  position: absolute;
+  background: white;
+  box-shadow: 0 10px 40px rgba(2,6,23,0.12);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  z-index: 40;
+  pointer-events: auto;
+  will-change: left, top, width, height, border-radius;
+}
+
+.expanding-overlay .overlay-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ensure smooth content fade inside overlay */
+.expanding-overlay .overlay-inner > * {
+  transition: opacity 240ms ease;
+}
+
+/* Footer styles */
+.site-footer {
+  /* use the accent gradient and ensure good contrast */
+  background: var(--accent-gradient);
+  color: white;
+  margin-top: 3rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.site-footer .footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.site-footer .footer-inner .text-sm {
+  color: rgba(255,255,255,0.92);
+}
+
+.site-footer a.footer-link {
+  color: rgba(255,255,255,0.88);
+  text-decoration: none;
+  font-size: 0.875rem; /* match text-sm */
+}
+.site-footer a.footer-link:hover,
+.site-footer a.footer-link:focus {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .site-footer .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* headshot wrapper to provide a visible border with the accent gradient */
+.headshot-wrapper {
+  padding: 4px; /* thickness of the gradient border */
+  background: linear-gradient(90deg, var(--g1), var(--g2));
+  display: inline-block;
+}
+
+/* footer icon links */
+.footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: rgba(255,255,255,0.88);
+  text-decoration: none;
+}
+.footer-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.footer-icon:hover,
+.footer-icon:focus {
+  color: #ffffff;
+}
+.headshot-img {
+  display: block;
+  /* keep image sizing controlled by utility classes on the element */
+  border-radius: 9999px;
+  background-clip: padding-box;
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+  <rect width="800" height="600" rx="12" fill="#f8fafc" />
+  <g fill="#cbd5e1">
+    <rect x="40" y="40" width="720" height="420" rx="8" />
+    <rect x="40" y="480" width="420" height="60" rx="8" />
+  </g>
+  <text x="60" y="520" font-family="Inter, system-ui, -apple-system" font-size="18" fill="#94a3b8">Image placeholder — replace with your image in /public</text>
+</svg>
