@@ -37,11 +37,13 @@ body {
 }
 
 main {
-  @apply min-h-screen;
+  /* allow flex children to size correctly when body is a column flex container
+     (we set body to `min-h-screen flex flex-col` in layout.tsx and make main flex-1) */
+  min-height: 0;
 }
 
 .section {
-  @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
+  @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
 }
 
 .section-title {
@@ -370,3 +372,6 @@ main {
   border-radius: 9999px;
   background-clip: padding-box;
 }
+
+/* Constrain embedded PDF previews so only the first page is visible (clipped). */
+/* PDF thumbnails removed; diplomas are now downloadable links only. */

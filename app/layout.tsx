@@ -15,7 +15,7 @@ export default function RootLayout({
   const year = new Date().getFullYear();
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen flex flex-col">
         <NavBar />
 
         {/* Top hero/banner - use homepage image */}
@@ -37,7 +37,7 @@ export default function RootLayout({
           </div>
         </div>
 
-        <main>
+        <main className="flex-1">
           <div className="content-area">
             <div className="section">{children}</div>
           </div>
