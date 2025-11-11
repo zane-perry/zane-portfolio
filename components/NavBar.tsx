@@ -29,11 +29,13 @@ export function NavBar() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 backdrop-blur site-nav">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        {/*
         <Link href="/" className="flex items-baseline gap-2">
           <span className="brand text-sm font-mono tracking-tight">
             zane.perry
           </span>
         </Link>
+        */}
         <button
           className="flex items-center gap-2 text-sm text-white sm:hidden"
           onClick={() => setOpen((v) => !v)}
