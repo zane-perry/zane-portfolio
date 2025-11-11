@@ -498,6 +498,41 @@ main {
   }
 }
 
+/* Footer slide animations */
+@keyframes footerSlideIn {
+  0% { opacity: 0; transform: translateY(18px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes footerSlideOut {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+.footer-slide-in {
+  opacity: 0;
+  animation-name: footerSlideIn;
+  animation-duration: 900ms; /* slightly longer for smoother arrival */
+  animation-timing-function: cubic-bezier(.2,.9,.2,1);
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+
+.footer-slide-out {
+  animation-name: footerSlideOut;
+  animation-duration: 180ms; /* quick exit to keep navigation snappy */
+  animation-timing-function: cubic-bezier(.2,.9,.2,1);
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-slide-in, .footer-slide-out {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* quick fade-out used when navigating away; keep it short and smooth */
 @keyframes fadeOutQuick {
   0% { opacity: 1; transform: translateY(0); }
