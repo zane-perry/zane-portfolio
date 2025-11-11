@@ -11,14 +11,14 @@ const projects = [
     role: "Senior Capstone Project",
     summary: "LLM-driven scaffolding tool for rapid prototyping of full-stack applications.",
     tags: ["LLM", "Full Stack", "Group Project", "API", "Agile/Scrum"],
-    status: "Presentation, Poster available"
+    status: "Poster, Presentation, Documentation available"
   },
   {
     title: "Advanced Music Recommendation using Deep Learning",
     role: "Research / Project",
     summary: "Multi-modal deep learning recommender combining audio signal features and user data.",
     tags: ["PyTorch", "Digital Signal Processing", "ML Design"],
-    status: "Poster, Report, Code available"
+    status: "Poster, Presentation, Report, Code available"
   },
   {
     title: "Boundary Integral Equation ODE/PDE Solver",
@@ -37,14 +37,14 @@ const projects = [
   {
     title: "Signal Noise Reducer",
     role: "Signal Processing",
-    summary: "Algorithms to denoise structured signals using spectral and ML-based filters.",
+    summary: "Algorithms to denoise audio signals using rank-revealing linear algebra techniques.",
     tags: ["Digital Signal Processing", "Filtering", "Linear Algebra"],
     status: "Presentation, Report, Code available"
   },
   {
     title: "Travel Planning Guide",
     role: "Utility / Web App",
-    summary: "A travel itinerary planner with route optimization and recommendations.",
+    summary: "A travel itinerary planner with ticket booking functionality, weather information, and an interactive calendar.",
     tags: ["Express", "APIs", "Group Project"],
     status: "Code available"
   },
