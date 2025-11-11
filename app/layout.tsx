@@ -5,6 +5,7 @@ import HeroParallax from "@/components/HeroParallax";
 import PageFade from "@/components/PageFade";
 import FadeProvider from "@/components/FadeProvider";
 import Footer from "@/components/Footer";
+import DigitalWaveBackground from "@/components/DigitalWaveBackground";
 
 export const metadata: Metadata = {
   title: "Zane Perry | Applied Math & ML",
@@ -39,8 +40,14 @@ export default function RootLayout({
 
           <main className="flex-1">
             <div className="content-area">
-              {/* PageFade handles entry animations on mount. */}
-              <PageFade>{children}</PageFade>
+              {/* Wave background sits above base background and behind content cards */}
+              <div className="relative">
+                <DigitalWaveBackground className="z-0" />
+                <div className="relative z-10">
+                  {/* PageFade handles entry animations on mount. */}
+                  <PageFade>{children}</PageFade>
+                </div>
+              </div>
             </div>
           </main>
           <Footer />

@@ -498,6 +498,27 @@ main {
   }
 }
 
+/* Very slow, subtle opacity-only fade for the waveform background */
+@keyframes waveFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.wave-fade {
+  opacity: 0;
+  animation-name: waveFadeIn;
+  animation-duration: 3600ms; /* long and subtle */
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-fade {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
 /* Footer slide animations */
 @keyframes footerSlideIn {
   0% { opacity: 0; transform: translateY(18px); }
