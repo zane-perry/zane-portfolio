@@ -59,43 +59,41 @@ main {
   /* create a gradient border using layered backgrounds
      - inner layer: white (card body)
      - outer layer: gradient (used as border) */
-  border: 2px solid transparent;
+  border: 3px solid transparent;
   /* use a slightly darker very light gray for the card body so it stands
     out a bit more from the white page background */
   /* layered backgrounds: base card body, accent gradient border layer */
   background-image: linear-gradient(#f1f5f9, #f1f5f9), var(--accent-gradient);
-  /* slightly stronger but still subtle shadow for better separation */
-  box-shadow: 0 10px 30px rgba(2,6,23,0.08);
+  /* slightly stronger gray shadow for clearer separation (tuned down slightly) */
+  box-shadow: 0 16px 48px rgba(2,6,23,0.10);
   background-origin: padding-box, border-box;
   background-clip: padding-box, border-box;
 }
 
 /* animated gradient movement on hover: the second background layer (accent) will move */
 .card {
-  /* make second layer larger so movement is visible */
-  background-size: 100% 100%, 200% 200%;
+  /* make second layer larger so movement is more visible when it moves */
+  /* larger size -> more color shift visible as the background-position moves */
+  background-size: 100% 100%, 300% 300%;
   /* start the accent gradient at the top center so rotation feels natural */
   background-position: center, 50% 0%;
 }
 
 .card:hover {
-  /* start a faster, continuous rotation-like movement while hovered */
-  /* reduced from 8s to 3.6s for a visibly quicker effect */
-  animation: card-gradient-move 3.6s linear infinite;
+  /* rotate the accent gradient around the card more quickly on hover only.
+     This affects only the second background layer's position (the gradient border).
+     Keep the rest of the card visuals unchanged. */
+  animation: card-gradient-move 1.8s linear infinite;
 }
 
 @keyframes card-gradient-move {
-  /* approximate a circular path around the card by moving the
-     background-position of the second layer through points on a circle */
+  /* simpler 4-step path produces a clearer 'rotation' around the card.
+     All moves target only the second background layer (the gradient). */
   0%   { background-position: center, 50% 0%; }
-  12.5%{ background-position: center, 85% 15%; }
   25%  { background-position: center, 100% 50%; }
-  37.5%{ background-position: center, 85% 85%; }
   50%  { background-position: center, 50% 100%; }
-  62.5%{ background-position: center, 15% 85%; }
   75%  { background-position: center, 0% 50%; }
-  87.5%{ background-position: center, 15% 15%; }
-  100% { background-position: center, 50% 0%; }
+ 100%  { background-position: center, 50% 0%; }
 }
 
 /* Respect users who prefer reduced motion */
@@ -123,7 +121,8 @@ body {
 .card {
   /* subtle light-gray card background so cards read as elevated panels */
   background-color: #f1f5f9;
-  box-shadow: 0 10px 30px rgba(2,6,23,0.08);
+  /* more pronounced gray shadow as the default (tuned down slightly) */
+  box-shadow: 0 16px 48px rgba(2,6,23,0.10);
   color: #0f172a;
 }
 
