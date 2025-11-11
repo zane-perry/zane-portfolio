@@ -25,10 +25,10 @@ export default function HomePage() {
 
           <p className="mt-4 max-w-2xl text-sm text-slate-700">
             I&apos;m a M.S. Applied Mathematics student at the University of Colorado
-            Boulder with a B.S. in Computer Science and Applied Math. I work at the
+            Boulder with a B.S. in Computer Science and Applied Mathematics. I work at the
             intersection of mathematical modeling, machine learning, and software
-            engineering — from genetic circuit modeling and scientific computing to
-            deep learning for music recommendation.
+            engineering with a deep interest in how technology can be used to enhance
+            existing scientific knowledge and drive innovation.
           </p>
         </div>
       </div>
@@ -38,19 +38,19 @@ export default function HomePage() {
           <h2 className="section-title text-xl mb-2">Current Focus</h2>
           <p className="text-sm text-slate-700">
             Designing hybrid mechanistic–machine learning models for genetic
-            circuits, advancing tools in the Genetic Logic Lab at CU Boulder, and
-            building production-quality software systems using React, Spring, and
-            modern DevOps practices.
+            circuits, advancing software tools in the Genetic Logic Lab at CU Boulder, and
+            deepening my knowledge of applied math with a focus on dynamical systems and modeling
+            with an emphasis on machine learning and data science through my graduate studies.
           </p>
         </section>
 
         <section className="card">
           <h2 className="section-title text-xl mb-2">Highlights</h2>
-          <ul className="mt-2 space-y-2 text-sm text-slate-700 list-disc list-inside">
-            <li>M.S. Applied Mathematics (4.0 GPA) with 200+ credits across math, CS, and science.</li>
+          <ul className="mt-2 space-y-2 text-sm text-slate-700 list-disc pl-5">
+            <li>M.S. Applied Mathematics (4.0 GPA) with 200+ credits across math, CS, engineering, and natural science.</li>
             <li>Research assistant in the CU Electrical Engineering Genetic Logic Lab.</li>
-            <li>Experience in radiation modeling, data analysis, and full-stack web apps.</li>
-            <li>Deep learning &amp; signal processing projects for music recommendation.</li>
+            <li>Experience in mathematical modeling, data analysis & data-driven machine learning, and full-stack web apps.</li>
+            <li>Passion for unique applications of mathematics and machine learning to bridge interdisciplinary gaps and bring theoretical concepts to life.</li>
           </ul>
         </section>
       </div>
@@ -63,22 +63,26 @@ export default function HomePage() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="card">
-            <h3 className="font-semibold text-lg">About me</h3>
-            <p className="text-sm text-slate-700 mt-3">When I&apos;m not working on models or code I like to keep my hands busy and my curiosity active. A few things I enjoy:</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-700 list-disc list-inside">
-              <li>Guitar and music production — experimenting with signal processing and recommendation systems.</li>
-              <li>Hiking and landscape photography around Colorado.</li>
-              <li>Cooking and trying recipes from different cuisines.</li>
-              <li>Open-source contributions and learning new tools (recently: Rust and PyTorch internals).</li>
-              <li>Reading technical books and papers — especially applied math and ML research.</li>
+            <h3 className="font-semibold text-lg">About Me</h3>
+            <p className="text-sm text-slate-700 mt-3">When I&apos;m not working on models or code I like to keep my mind busy and my curiosity active. A few things I enjoy:</p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-700 list-disc pl-5">
+              <li>Violin & Piano - A lifelong passion for music that inspires my creativity and gives me a stake in the artistic process.</li>
+              <li>Music Production - Exploring sound design and audio engineering techniques to understand how the music I love comes to be.</li>
+              <li>Theta Tau Professional Engineering Fraternity - Using my leadership skills to promote collaboration and professional development among members, while also learning valuable lessons in project management and responsibility</li>
+              <li>Expanding my Knowledge Base - Continuously seeking out new learning opportunities and learning how to apply new concepts in both software and mathematical approaches.</li>
+              <li>Networking & Mentorship - I love getting to know people beyond their work by understanding what excites them, what they value, and how they see the world. I enjoy sharing lessons I&apos;ve learned and learning from others in return. For me, connection and conversation are some of the most meaningful ways to keep growing.</li>
             </ul>
           </div>
 
           <div className="card">
-            <h3 className="font-semibold text-lg">My philosophy</h3>
-            <p className="text-sm text-slate-700 mt-3">I approach problems by combining principled mathematical modeling with pragmatic engineering. I believe good models are interpretable, testable, and integrated with data-driven components where appropriate.</p>
-            <p className="text-sm text-slate-700 mt-3">I value reproducibility, well-documented code, and clear communication — whether in research papers, code reviews, or collaborative projects. I aim to build tools and models that are useful to domain experts and production-ready when needed.</p>
-            <p className="text-sm text-slate-700 mt-3">Collaboration and mentorship are important: I seek diverse perspectives and enjoy helping others learn and grow through code reviews, talks, and open-source contributions.</p>
+            <h3 className="font-semibold text-lg">My Philosophy</h3>
+            <p className="text-sm text-slate-700 mt-3">Technology should enhance our tools, not our distance from one another, and should benefit everyone across all industries.</p>
+            <p className="text-sm text-slate-700 mt-3">Technology has always been one of humanity&apos;s most powerful tools, but like any tool, its value depends on the intention and understanding behind it.
+I believe that the best technology doesn&apos;t try to replace people; it helps them see, create, and connect more clearly. The best systems don&apos;t operate in isolation. They grow from interdisciplinary collaboration and diverse perspectives, built by people who listen as much as they invent.</p>
+            <p className="text-sm text-slate-700 mt-3">Every system I build, whether it&apos;s a mathematical model, a machine learning framework, or a creative interface, starts from that principle. Tools should 
+              be designed with care, not just capability; with an understanding of the human context they exist within. Progress isn&apos;t just measured in efficiency or performance, but in how well we preserve empathy, clarity, and meaning along the way.</p>
+            <p className="text-sm text-slate-700 mt-3">Innovation and responsibility are not opposites. The most impactful technologies are those that balance both, rigorous in their logic, but guided by respect for the people who use them and the world they affect.
+When built thoughtfully and collaboratively, technology doesn&apos;t just solve problems, it helps us understand the world, and one another, more deeply.</p>
           </div>
         </div>
 
@@ -88,7 +92,7 @@ export default function HomePage() {
       <div className="mt-10">
         <section className="mb-6">
           <h2 className="section-title">Education</h2>
-          <p className="section-subtitle">Academic background and transcripts.</p>
+          <p className="section-subtitle">Academic background and degrees.</p>
         </section>
 
     <div className="grid gap-6 grid-cols-1">
@@ -104,7 +108,9 @@ export default function HomePage() {
 
             <div className="mt-4">
               <p className="text-xs font-medium text-slate-500">Diploma / Transcript</p>
-              <a href="/CompSci.pdf" className="mt-2 inline-block text-sm text-accent hover:underline" target="_blank" rel="noreferrer">Download B.S. Computer Science (PDF)</a>
+              <a href="/CompSci.pdf" className="mt-2 inline-block text-sm text-accent hover:underline" target="_blank" rel="noopener noreferrer">View B.S. Computer Science (PDF)</a>
+              <br />
+              <a href="/CompSci.pdf" className="mt-2 inline-block text-sm text-accent hover:underline" download>Download B.S. Computer Science (PDF)</a>
             </div>
           </div>
 
@@ -114,7 +120,9 @@ export default function HomePage() {
 
             <div className="mt-4">
               <p className="text-xs font-medium text-slate-500">Diploma / Transcript</p>
-              <a href="/Math.pdf" className="mt-2 inline-block text-sm text-accent hover:underline" target="_blank" rel="noreferrer">Download B.S. Applied Mathematics (PDF)</a>
+              <a href="/Math.pdf" className="mt-2 inline-block text-sm text-accent hover:underline" target="_blank" rel="noopener noreferrer">View B.S. Applied Mathematics (PDF)</a>
+              <br />
+              <a href="/Math.pdf" className="mt-2 inline-block text-sm text-accent hover:underline" download>Download B.S. Applied Mathematics (PDF)</a>
             </div>
           </div>
         </div>

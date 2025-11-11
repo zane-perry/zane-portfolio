@@ -1,6 +1,7 @@
 const groups = [
   {
     title: "Core Mathematics",
+    subtitle: "Departments: Applied Mathematics, Statistics",
     items: [
       "Calculus I-III",
       "Differential Equations",
@@ -15,6 +16,7 @@ const groups = [
   },
   {
     title: "Core Computer Science",
+    subtitle: "Departments: Computer Science",
     items: [
       "Data Structures",
       "Computer Systems",
@@ -29,6 +31,7 @@ const groups = [
   },
   {
     title: "Dynamics and Modeling",
+    subtitle: "Departments: Applied Mathematics, Computer Science",
     items: [
       "Differential Equations Computational Lab",
       "Differential Dynamical Systems (Grad)",
@@ -40,6 +43,7 @@ const groups = [
   },
   {
     title: "Data Science, ML & AI",
+    subtitle: "Departments: Applied Mathematics, Computer Science, Statistics",
     items: [
       "Applied Probability",
       "Data Science",
@@ -48,11 +52,13 @@ const groups = [
       "Machine Learning (Grad)",
       "Neural Networks & Deep Learning (Grad)",
       "Time Series Analysis (Grad)",
+      "Computational Bayesian Statistics (Grad)",
       "Theory of Machine Learning (Audit)"
     ]
   },
   {
     title: "Biology",
+    subtitle: "Departments: Molecular, Cellular, and Developmental Biology",
     items: [
       "Molecular Biology",
       "Genetics",
@@ -64,6 +70,7 @@ const groups = [
   },
   {
     title: "Interdisciplinary",
+    subtitle: "Departments: Computer Science, Music, Physics, Electrical Engineering",
     items: [
       "Music Technology",
       "Cognitive Science",
@@ -80,17 +87,20 @@ export default function CourseworkPage() {
     <div className="section">
       <h1 className="section-title">Coursework</h1>
       <p className="section-subtitle">
-        I&apos;ve completed an unusually broad and deep curriculum in applied
-        mathematics, computer science, and the sciences, with more than 200
-        credit hours. This page is a thematic snapshot rather than a literal
-        transcript.
+        I&apos;ve completed a uniquely broad and deep curriculum in applied
+        mathematics, computer science, and the natural sciences, with more than 200
+        credit hours. This page gives an overview of my completed coursework,
+        grouped by topic area.
       </p>
 
       <div className="grid gap-4 md:grid-cols-2">
         {groups.map((group) => (
           <section key={group.title} className="card">
             <h2 className="text-base font-semibold">{group.title}</h2>
-            <ul className="mt-3 space-y-1 text-sm text-slate-700 list-disc list-inside">
+            {group.subtitle && (
+              <p className="text-xs text-slate-500 mt-1">{group.subtitle}</p>
+            )}
+            <ul className="mt-3 space-y-1 text-sm text-slate-700 list-disc pl-5">
               {group.items.map((item) => (
                 <li key={item}>{item}</li>
               ))}

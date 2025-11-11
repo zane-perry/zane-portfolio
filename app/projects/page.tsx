@@ -2,63 +2,65 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { projectDetailsMap } from "../../data/projects";
+import FilePreview from "../../components/FilePreview";
 
 const projects = [
   {
     title: "AI Assisted Rapid Prototyper",
-    role: "Capstone / Tooling",
+    role: "Senior Capstone Project",
     summary: "LLM-driven scaffolding tool for rapid prototyping of full-stack applications.",
-    tags: ["LLM", "Full Stack", "Tooling"],
-    status: "Prototype available"
+    tags: ["LLM", "Full Stack", "Group Project", "API", "Agile/Scrum"],
+    status: "Presentation, Poster available"
   },
   {
     title: "Advanced Music Recommendation using Deep Learning",
     role: "Research / Project",
     summary: "Multi-modal deep learning recommender combining audio signal features and user data.",
-    tags: ["PyTorch", "Recommenders", "DSP"],
-    status: "Write-up coming"
+    tags: ["PyTorch", "Digital Signal Processing", "ML Design"],
+    status: "Poster, Report, Code available"
   },
   {
     title: "Boundary Integral Equation ODE/PDE Solver",
     role: "Applied Math",
     summary: "Numerical quadrature and boundary integral methods for ODE/PDE problems.",
-    tags: ["Numerical", "PDE", "Python"],
-    status: "Code in progress"
+    tags: ["Numerical", "PDE", "Python", "NumPy"],
+    status: "Presentation, Report, Code available"
   },
   {
     title: "Airfoil Fluid Simulation",
-    role: "Simulation / CFD",
+    role: "Simulation / Real Data",
     summary: "Computational fluid dynamics simulations for airfoil design and analysis.",
-    tags: ["CFD", "Simulation", "Fortran/Python"],
-    status: "Demo available"
+    tags: ["CFD", "Simulation", "Matlab"],
+    status: "Presentation, Report available"
   },
   {
     title: "Signal Noise Reducer",
     role: "Signal Processing",
     summary: "Algorithms to denoise structured signals using spectral and ML-based filters.",
-    tags: ["DSP", "Filtering", "ML"],
-    status: "Examples available"
+    tags: ["Digital Signal Processing", "Filtering", "Linear Algebra"],
+    status: "Presentation, Report, Code available"
   },
   {
     title: "Travel Planning Guide",
     role: "Utility / Web App",
     summary: "A travel itinerary planner with route optimization and recommendations.",
-    tags: ["React", "APIs", "Optimization"],
-    status: "Prototype"
+    tags: ["Express", "APIs", "Group Project"],
+    status: "Code available"
   },
   {
     title: "Image Compressor",
     role: "Tooling / Research",
-    summary: "Perceptual image compression experiments combining signal transforms and learned codecs.",
-    tags: ["Compression", "Perceptual", "Autoencoders"],
-    status: "Research notes"
+    summary: "Compression of images using discrete wavelet transforms and SVD techniques.",
+    tags: ["Signal Processing", "Linear Algebra"],
+    status: "Report available"
   },
   {
     title: "Minigit File Version Control",
     role: "Systems / Tools",
     summary: "Small-scale version control implementation demonstrating core VCS primitives.",
-    tags: ["Git", "Systems", "Rust/Python"],
-    status: "Educational"
+    tags: ["Git", "Data Structures", "C/C++"],
+    status: "Code available"
   }
 ];
 
@@ -66,6 +68,7 @@ export default function ProjectsPage() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const tiltRaf = useRef<Record<string, number>>({});
+  const bodyOverflowRef = useRef<string | null>(null);
   const [animating, setAnimating] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -93,6 +96,33 @@ export default function ProjectsPage() {
       // do not remove shared portal root on unmount; leave it present
     };
   }, []);
+
+  // Prevent background scrolling when an overlay is open by toggling body overflow.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (active) {
+      // store previous overflow so we can restore it later
+      bodyOverflowRef.current = document.body.style.overflow || null;
+      document.body.style.overflow = 'hidden';
+    } else {
+      if (bodyOverflowRef.current !== null) {
+        document.body.style.overflow = bodyOverflowRef.current;
+        bodyOverflowRef.current = null;
+      } else {
+        // if we didn't store anything, clear the style
+        document.body.style.overflow = '';
+      }
+    }
+
+    return () => {
+      if (bodyOverflowRef.current !== null) {
+        document.body.style.overflow = bodyOverflowRef.current;
+        bodyOverflowRef.current = null;
+      } else {
+        document.body.style.overflow = '';
+      }
+    };
+  }, [active]);
 
   function close() {
     if (!overlayRef.current) {
@@ -262,8 +292,7 @@ export default function ProjectsPage() {
       <h1 className="section-title">Projects</h1>
       <p className="section-subtitle">
         A small selection of technical and research projects. Click any card to
-        expand it and see more details (the card will grow to cover the
-        content).
+        expand it and see more details.
       </p>
 
   <div className={`grid gap-4 md:grid-cols-2 ${active ? 'projects-faded' : ''}`}>
@@ -327,31 +356,75 @@ export default function ProjectsPage() {
               </div>
 
               <div className="mt-4 overflow-auto">
-                <p className="text-sm text-slate-700">
-                  Expanded details for <strong>{active}</strong>. Add posters,
-                  papers, images, code links, and extended descriptions here.
-                </p>
-                <div className="mt-4 space-y-6">
-                  <div>
-                    <h3 className="font-semibold">Overview</h3>
-                    <p className="text-sm text-slate-700">
-                      Placeholder overview text describing the project, goals,
-                      approaches, and results.
-                    </p>
-                  </div>
+                {(() => {
+                  const details = active ? projectDetailsMap[active] : undefined;
+                  if (!details) {
+                    return (
+                      <div className="space-y-4">
+                        <p className="text-sm text-slate-700">
+                          Expanded details for <strong>{active}</strong>.
+                        </p>
+                        <div role="separator" aria-orientation="horizontal" className="h-px w-full bg-slate-200" />
+                        <p className="text-sm text-slate-700">Content coming soon.</p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="space-y-6">
+                      <section>
+                        <h3 className="font-semibold">Overview</h3>
+                        <p className="text-sm text-slate-700 whitespace-pre-line">{details.overview}</p>
+                      </section>
 
-                  {/* visible divider between sections */}
-                  <div role="separator" aria-orientation="horizontal" className="h-px w-full bg-slate-200" />
+                      {(details.sections && details.sections.length > 0) && (
+                        <>
+                          <div role="separator" aria-orientation="horizontal" className="h-px w-full bg-slate-200" />
+                          {details.sections.map((s, i) => (
+                            <section key={i} className="space-y-2">
+                              <h3 className="font-semibold">{s.title}</h3>
+                              {s.paragraphs && s.paragraphs.map((p, j) => (
+                                <p key={j} className="text-sm text-slate-700">{p}</p>
+                              ))}
+                              {s.bullets && (
+                                <ul className="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                  {s.bullets.map((b, j) => (
+                                    <li key={j}>{b}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </section>
+                          ))}
+                        </>
+                      )}
 
-                  <div>
-                    <h3 className="font-semibold">Artifacts</h3>
-                    <ul className="list-disc list-inside text-sm text-slate-700">
-                      <li>Poster (placeholder)</li>
-                      <li>Code repository (placeholder)</li>
-                      <li>Write-up / report (placeholder)</li>
-                    </ul>
-                  </div>
-                </div>
+                      {details.links && details.links.length > 0 ? (
+                        <>
+                          <div role="separator" aria-orientation="horizontal" className="h-px w-full bg-slate-200" />
+                          <section>
+                            <h3 className="font-semibold">Artifacts</h3>
+                            <div className="mt-3 flex flex-col gap-4">
+                              {details.links.map((l, i) => (
+                                <FilePreview key={i} label={l.label} href={l.href} />
+                              ))}
+                            </div>
+                          </section>
+                        </>
+                      ) : details.artifacts && details.artifacts.length > 0 && (
+                        <>
+                          <div role="separator" aria-orientation="horizontal" className="h-px w-full bg-slate-200" />
+                          <section>
+                            <h3 className="font-semibold">Artifacts</h3>
+                            <ul className="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                              {details.artifacts.map((a, i) => (
+                                <li key={i}>{a}</li>
+                              ))}
+                            </ul>
+                          </section>
+                        </>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -361,5 +434,3 @@ export default function ProjectsPage() {
     </div>
   );
 }
-
-//1, 2, 4, 5, 7, 8, 9, 11, 12, 14
