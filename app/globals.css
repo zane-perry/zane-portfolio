@@ -14,7 +14,7 @@
 
 /* Navigation height (header). Tune if your header height differs. */
 :root {
-  --nav-height: 3.25rem; /* tune to actual header height so hero sits higher */
+  --nav-height: 3.5rem; /* slightly thicker navbar as requested */
 }
 
 body {
@@ -273,6 +273,16 @@ header.site-nav {
   position: sticky;
   top: 0;
   z-index: 60;
+  /* only set the visual height here so internal layout (buttons) is unchanged */
+  height: var(--nav-height);
+}
+
+/* Ensure the immediate inner container stretches to the header height so its
+   `items-center` utility (applied in the component) vertically centers the
+   brand and nav links without changing horizontal layout. This avoids touching
+   the inner container's padding or flex behavior. */
+header.site-nav > div {
+  height: 100%;
 }
 
 /* Ensure the page content initially sits below the fixed hero */
@@ -303,17 +313,43 @@ main {
   pointer-events: auto;
   /* subtle backdrop to indicate modal state and provide a click target */
   background: rgba(2,6,23,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px; /* keep some space on small viewports */
+  z-index: 99990; /* ensure overlay container sits above page content */
 }
 
+
 .expanding-overlay {
+  /* Use absolute positioning inside the fixed full-viewport container so
+     JS can set left/top/width/height using viewport coordinates. This keeps
+     the overlay visually detached from page layout and prevents transforms
+     on parent containers from shifting it. */
   position: absolute;
+  left: 0;
+  top: 0;
   background: white;
   box-shadow: 0 10px 40px rgba(2,6,23,0.12);
   border-radius: 0.75rem;
   overflow: hidden;
-  z-index: 40;
+  z-index: 99999;
   pointer-events: auto;
-  will-change: left, top, width, height, border-radius;
+  /* allow JS to animate geometry (left/top/width/height) and border-radius */
+  will-change: left, top, width, height, border-radius, opacity;
+  /* geometry transition for the morph animation */
+  transition: left 420ms cubic-bezier(.2,.9,.2,1),
+              top 420ms cubic-bezier(.2,.9,.2,1),
+              width 420ms cubic-bezier(.2,.9,.2,1),
+              height 420ms cubic-bezier(.2,.9,.2,1),
+              border-radius 320ms ease,
+              opacity 240ms ease;
+  /* do not force an initial transform scale here — JS will control visual
+     presentation so the starting geometry matches the card position exactly */
+  opacity: 1;
+  display: block;
+  max-width: 1000px;
+  max-height: calc(100vh - 120px);
 }
 
 .expanding-overlay .overlay-inner {
@@ -340,10 +376,19 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  /* constrain footer content width so the footer reads narrower without moving buttons */
+  max-width: 40rem !important;
+  margin: 0 auto;
+  /* reduce vertical padding to make the footer shorter while preserving horizontal padding */
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
 }
 
 .site-footer .footer-inner .text-sm {
   color: rgba(255,255,255,0.92);
+  /* slightly larger and bolder for the footer name */
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .site-footer a.footer-link {
@@ -376,14 +421,14 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   color: rgba(255,255,255,0.88);
   text-decoration: none;
 }
 .footer-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: block;
 }
 .footer-icon:hover,
@@ -436,7 +481,10 @@ main {
   opacity: 0;
   animation-name: fadeInUp;
   /* slower: make the entrance noticeably more deliberate */
-  animation-duration: 1200ms;
+  /* longer duration for a full page load */
+  animation-duration: 1000ms;
+  /* small initial delay for full loads */
+  animation-delay: 2000ms;
   animation-timing-function: cubic-bezier(.2,.9,.2,1);
   animation-fill-mode: forwards;
   will-change: transform, opacity;
@@ -445,6 +493,41 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .fade-in {
     animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* quick fade-out used when navigating away; keep it short and smooth */
+@keyframes fadeOutQuick {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(4px); }
+}
+
+.fade-out {
+  animation-name: fadeOutQuick;
+  animation-duration: 160ms;
+  animation-timing-function: cubic-bezier(.2,.9,.2,1);
+  animation-fill-mode: forwards;
+  will-change: opacity, transform;
+}
+
+/* ScrollReveal utility classes applied via JS for out-of-viewport content */
+.sr-hidden {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 680ms cubic-bezier(.2,.9,.2,1), transform 680ms cubic-bezier(.2,.9,.2,1);
+  will-change: opacity, transform;
+}
+
+.sr-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sr-hidden, .sr-visible {
+    transition: none !important;
     opacity: 1 !important;
     transform: none !important;
   }

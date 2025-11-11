@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const projects = [
   {
@@ -68,6 +69,7 @@ export default function ProjectsPage() {
   const [animating, setAnimating] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const [portalRoot, setPortalRoot] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -76,6 +78,21 @@ export default function ProjectsPage() {
     if (active) document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [active]);
+
+  // Ensure there's a stable portal root in document.body for the overlay.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    let root = document.getElementById('projects-portal') as HTMLDivElement | null;
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'projects-portal';
+      document.body.appendChild(root);
+    }
+    setPortalRoot(root);
+    return () => {
+      // do not remove shared portal root on unmount; leave it present
+    };
+  }, []);
 
   function close() {
     if (!overlayRef.current) {
@@ -88,6 +105,10 @@ export default function ProjectsPage() {
       return;
     }
     const cardRect = card.getBoundingClientRect();
+
+    // diagnostic
+    // eslint-disable-next-line no-console
+    console.log('[projects] close: cardRect', cardRect, 'overlayRef', overlayRef.current);
 
     // animate overlay back to card position (viewport coordinates)
     overlayRef.current.style.transition = 'all 400ms cubic-bezier(.2,.9,.2,1)';
@@ -111,37 +132,90 @@ export default function ProjectsPage() {
     const cardRect = card.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
 
+    // diagnostic
+    // eslint-disable-next-line no-console
+    console.log('[projects] open: cardRect', cardRect, 'containerRect', containerRect, 'portalRoot', portalRoot);
+
     const left = cardRect.left - containerRect.left;
     const top = cardRect.top - containerRect.top;
 
     setActive(title);
 
     // wait for overlay to be in DOM
-    requestAnimationFrame(() => {
+    // wait for the overlay DOM node to be attached (refs may not be set
+    // immediately after state change). Poll for a few frames then proceed.
+    let tries = 0;
+    function waitForOverlay() {
+      tries += 1;
+      if (overlayRef.current) {
+        // diagnostic
+        // eslint-disable-next-line no-console
+        console.log('[projects] overlayRef now present', overlayRef.current);
+        placeAndAnimate();
+        return;
+      }
+      if (tries < 8) {
+        requestAnimationFrame(waitForOverlay);
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn('[projects] overlayRef not found after waiting');
+        // create a temporary visual indicator in the portal so it's obvious
+        // whether the portal mounted at all (debug only). This does not
+        // intercept pointer events.
+        if (portalRoot && !document.getElementById('projects-portal-debug')) {
+          const dbg = document.createElement('div');
+          dbg.id = 'projects-portal-debug';
+          dbg.style.position = 'fixed';
+          dbg.style.left = '8px';
+          dbg.style.top = '8px';
+          dbg.style.padding = '8px 12px';
+          dbg.style.background = 'rgba(220,38,38,0.85)';
+          dbg.style.color = 'white';
+          dbg.style.zIndex = '99999';
+          dbg.style.borderRadius = '6px';
+          dbg.style.pointerEvents = 'none';
+          dbg.textContent = 'projects-portal mounted — overlay ref missing';
+          portalRoot.appendChild(dbg);
+        }
+      }
+    }
+    requestAnimationFrame(waitForOverlay);
+
+    function placeAndAnimate() {
       if (!overlayRef.current) return;
-      // initial position over the card (viewport coordinates)
+      // place the overlay directly over the card using viewport coordinates
+      // disable transitions for the immediate placement so the element snaps
+      // to the card geometry, then re-enable transitions and expand to center.
+      overlayRef.current.style.transition = 'none';
       overlayRef.current.style.left = `${cardRect.left}px`;
       overlayRef.current.style.top = `${cardRect.top}px`;
       overlayRef.current.style.width = `${cardRect.width}px`;
       overlayRef.current.style.height = `${cardRect.height}px`;
-      overlayRef.current.style.borderRadius = window.getComputedStyle(card).borderRadius || '0.75rem';
+  overlayRef.current.style.borderRadius = window.getComputedStyle(card as Element).borderRadius || '0.75rem';
+      overlayRef.current.style.opacity = '1';
 
-      // force layout then expand to a centered panel in the viewport
-      requestAnimationFrame(() => {
+      // force layout so the 'none' transition is applied immediately
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      overlayRef.current.offsetWidth;
+
+      // expand to a centered panel in the viewport on the next frame
+  requestAnimationFrame(() => {
         const maxWidth = Math.min(1000, window.innerWidth - 48);
         const maxHeight = Math.min(window.innerHeight - 120, window.innerHeight - 48);
-        // center in the viewport (fixed overlay uses viewport coordinates)
+        // center in the viewport
         const targetLeft = (window.innerWidth - maxWidth) / 2;
         const targetTop = Math.max(24, (window.innerHeight - maxHeight) / 2);
 
-        overlayRef.current!.style.transition = 'all 480ms cubic-bezier(.2,.9,.2,1)';
+        // allow CSS transitions to run (use the CSS-defined timing)
+        overlayRef.current!.style.transition = '';
+
         overlayRef.current!.style.left = `${targetLeft}px`;
         overlayRef.current!.style.top = `${targetTop}px`;
         overlayRef.current!.style.width = `${maxWidth}px`;
         overlayRef.current!.style.height = `${maxHeight}px`;
         overlayRef.current!.style.borderRadius = '0.75rem';
       });
-    });
+    }
   }
 
   // Pointer-based tilt: lightweight rAF updates to the card's transform
@@ -225,8 +299,9 @@ export default function ProjectsPage() {
         ))}
       </div>
 
-      {/* expanding overlay element that animates from card to full content area */}
-      {active && (
+      {/* expanding overlay element rendered in a portal to avoid being
+          affected by ancestor transforms (e.g. the .fade-in animation). */}
+  {active && portalRoot && createPortal(
         <div
           className="projects-overlay-container"
           aria-hidden={false}
@@ -239,11 +314,7 @@ export default function ProjectsPage() {
             }
           }}
         >
-          <div
-            ref={overlayRef}
-            className="expanding-overlay"
-            style={{ left: 0, top: 0, width: 0, height: 0 }}
-          >
+          <div ref={overlayRef} className="expanding-overlay">
             <div className="overlay-inner p-6 flex flex-col">
               <div className="flex items-start justify-between">
                 <h2 className="text-2xl font-semibold">{active}</h2>
@@ -284,7 +355,8 @@ export default function ProjectsPage() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        portalRoot || document.body
       )}
     </div>
   );

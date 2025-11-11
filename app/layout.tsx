@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
 import HeroParallax from "@/components/HeroParallax";
+import PageFade from "@/components/PageFade";
+import FadeProvider from "@/components/FadeProvider";
 
 export const metadata: Metadata = {
   title: "Zane Perry | Applied Math & ML",
@@ -17,10 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
-        <NavBar />
+        <FadeProvider>
+          <NavBar />
 
-        {/* Top hero/banner - use homepage image */}
-        <div className="hero-banner" role="img" aria-label="Homepage banner">
+          {/* Top hero/banner - use homepage image */}
+          <div className="hero-banner" role="img" aria-label="Homepage banner">
           <img
             src="/homepage.avif"
             alt="Homepage banner"
@@ -33,11 +36,13 @@ export default function RootLayout({
           </div>
         </div>
 
-        <main className="flex-1">
-          <div className="content-area">
-            <div className="section">{children}</div>
-          </div>
-        </main>
+          <main className="flex-1">
+            <div className="content-area">
+              {/* PageFade handles entry animations on mount. */}
+              <PageFade>{children}</PageFade>
+            </div>
+          </main>
+        </FadeProvider>
         
         <footer className="site-footer">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 footer-inner">

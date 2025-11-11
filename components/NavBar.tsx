@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useFade } from "@/components/FadeProvider";
 
 const links = [
   { href: "/", label: "Home" },
@@ -16,6 +17,14 @@ const links = [
 export function NavBar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const fade = (() => {
+    try {
+      return useFade();
+    } catch (e) {
+      return null;
+    }
+  })();
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 backdrop-blur site-nav">
@@ -38,6 +47,13 @@ export function NavBar() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={(e) => {
+                  // intercept internal links and use fade navigation if available
+                  if (fade && link.href.startsWith('/')) {
+                    e.preventDefault();
+                    fade.navigate(link.href);
+                  }
+                }}
                 className={
                   "transition-colors " +
                   (active
@@ -60,7 +76,13 @@ export function NavBar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => {
+                    setOpen(false);
+                    if (fade && link.href.startsWith('/')) {
+                      e.preventDefault();
+                      fade.navigate(link.href);
+                    }
+                  }}
                   className={
                     "transition-colors " +
                     (active
