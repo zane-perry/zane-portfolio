@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
+import HeroParallax from "@/components/HeroParallax";
 
 export const metadata: Metadata = {
   title: "Zane Perry | Applied Math & ML",
@@ -23,16 +24,11 @@ export default function RootLayout({
           <img
             src="/homepage.avif"
             alt="Homepage banner"
-            className="w-full h-48 sm:h-64 md:h-72 object-cover"
+            className="w-full object-cover"
           />
           <div className="hero-overlay">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
-                  Zane Perry
-                </h1>
-                <p className="mt-3 text-base sm:text-lg md:text-xl text-white/90">
-                  Applied math · Machine learning · Software
-                </p>
+                  <HeroParallax />
               </div>
           </div>
         </div>

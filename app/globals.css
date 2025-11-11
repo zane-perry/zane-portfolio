@@ -170,31 +170,54 @@ header.site-nav .brand {
   letter-spacing: -0.01em;
 }
 
-/* Small configurable gap so part of the hero remains visible before scrolling */
+/* Small configurable gap so part of the hero remains visible before scrolling
+   (set to 0 so the hero meets the content area unless you opt for visual gap) */
 :root {
-  --hero-gap: 2rem; /* adjust as needed */
+  --hero-gap: 0rem; /* adjust as needed; 0 prevents a white gap between hero and content */
+  --content-offset: 3rem; /* additional downward offset for main content */
 }
 
 .hero-banner {
-  /* keep the hero in the document flow; place it at the very top so
-     no empty whitespace appears above it. The header will sit above
-     the hero (sticky) and may overlap the top portion of the image. */
-  position: sticky;
+  /* Fixed hero so it remains visually continuous under the semi-opaque nav.
+     - position: fixed keeps the banner locked to the viewport top so it
+       doesn't 'stop' when the header becomes sticky.
+     - keep a low z-index so the nav (z-index:60) and content area (z-index:20)
+       can layer above as designed: nav above hero, content above hero. */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  overflow: hidden;
+  /* allow the image to extend below the hero container so the bottom is not
+     cut off; the page content (z-index:20) will sit above any excess image */
+  overflow: visible;
   width: 100%;
   height: var(--hero-height);
   z-index: 10; /* beneath header, under content */
 }
 
 .hero-banner img {
-  display: block;
+  /* Position absolute so the image top lines up with the page top and the
+     image may extend downward beyond the hero container. Use min-height to
+     ensure the hero area is covered while allowing overflow to be hidden by
+     content above it. */
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: auto;
+  min-height: var(--hero-height);
   object-fit: cover;
-  object-position: center center; /* show the middle of the image */
+  /* default to showing the bottom of the image so the lower part isn't cut off */
+  object-position: var(--hero-image-position, center 100%);
+  z-index: 0;
+  /* slight upward offset so the image extends higher (top may be cut off)
+     while leaving layout and content unchanged. Default -10rem as requested. */
+  transform: translateY(var(--hero-banner-offset, -3rem));
+  will-change: transform;
+}
+
+.hero-overlay {
+  z-index: 5; /* sits above the image but below content and nav */
 }
 
 .hero-overlay {
@@ -255,8 +278,10 @@ header.site-nav {
 
 /* Ensure the page content initially sits below the fixed hero */
 main {
-  /* hero is in the flow (sticky), so no extra padding is required here */
-  padding-top: 0;
+  /* Keep the main content positioned below the hero. Add an extra offset
+     so content starts further down (useful to expose more of the banner).
+     Controlled by --content-offset (default 5rem). */
+  padding-top: calc(var(--hero-height) + var(--content-offset));
 }
 
 /* Projects expanding-card animation styles */
@@ -375,3 +400,53 @@ main {
 
 /* Constrain embedded PDF previews so only the first page is visible (clipped). */
 /* PDF thumbnails removed; diplomas are now downloadable links only. */
+
+/* Parallax container - used by client HeroParallax component */
+.parallax-container {
+  will-change: transform;
+  /* keep transform origin centered so motion looks natural */
+  transform-origin: center top;
+}
+
+/* move the hero text slightly lower inside the parallax container
+   without affecting the parallax transform (which modifies the container)
+   - use CSS variable --hero-text-offset, default 2rem */
+.parallax-container .hero-text {
+  margin-top: var(--hero-text-offset, 8rem);
+}
+
+@media (max-width: 640px) {
+  .parallax-container .hero-text {
+    margin-top: var(--hero-text-offset-mobile, 1.25rem);
+  }
+}
+
+/* Fade-in staggered animations for hero title/subtitle */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  animation-name: fadeInUp;
+  /* slower: make the entrance noticeably more deliberate */
+  animation-duration: 1200ms;
+  animation-timing-function: cubic-bezier(.2,.9,.2,1);
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
