@@ -6,16 +6,62 @@
   color-scheme: light;
 }
 
-/* Global hero sizing so other elements (main) can read it */
+/* Hero & layout variables (single source of truth)
+   - Define sensible defaults for large screens and override them at
+     narrower breakpoints below. Keep variables in one place so tweaking
+     values is straightforward. */
 :root {
-  --hero-height: 16rem; /* slightly taller than h-48 (was 12rem) */
-  --hero-gap: 1rem; /* visible gap between hero and content (reduced) */
+  /* Desktop / large screens */
+  --hero-height: 20rem;         /* hero container height */
+  --hero-gap: 1rem;            /* visual gap between hero and content (unused by default) */
+  --hero-banner-offset: -3rem; /* translateY: negative pulls the image up */
+  --content-offset: 3rem;      /* extra space to push the main content down */
+  --hero-text-offset: 8rem;    /* vertical offset for hero text inside parallax */
+  --nav-height: 3.5rem;        /* header height */
 }
 
-/* Navigation height (header). Tune if your header height differs. */
-:root {
-  --nav-height: 3.5rem; /* slightly thicker navbar as requested */
+@media (max-width: 1460px) {
+  :root {
+    --hero-height: 18.5rem;
+    --hero-banner-offset: 1rem;
+    --content-offset: -5rem;
+    --hero-text-offset: 7rem;
+  }
 }
+
+/* Medium screens: soften offsets */
+@media (max-width: 1024px) {
+  :root {
+    --hero-height: 18.5rem;
+    --hero-banner-offset: 1rem;
+    --content-offset: -5rem;
+    --hero-text-offset: 7rem;
+  }
+}
+
+/* Tablet / small laptop */
+@media (max-width: 768px) {
+  :root {
+    --hero-height: 16rem;
+    --hero-banner-offset: 1rem;
+    --content-offset: -3rem;
+    --hero-text-offset: 5.25rem;
+  }
+}
+
+/* Narrow mobile: content-forward layout (most phones) */
+@media (max-width: 640px) {
+  :root {
+    --hero-height: 12.25rem;
+    --hero-banner-offset: 2.5rem; /* positive -> pushes image down */
+    --content-offset: -1rem;    /* reduce extra spacing so content appears higher */
+    --hero-text-offset: 2.25rem;
+  }
+}
+
+/* Navigation height is defined in the hero & layout variables above
+   (see the single source-of-truth :root at the top). Avoid redefining
+   --nav-height elsewhere. */
 
 body {
   @apply bg-background text-slate-900 antialiased;
@@ -179,12 +225,9 @@ header.site-nav .brand {
   letter-spacing: -0.01em;
 }
 
-/* Small configurable gap so part of the hero remains visible before scrolling
-   (set to 0 so the hero meets the content area unless you opt for visual gap) */
-:root {
-  --hero-gap: 0rem; /* adjust as needed; 0 prevents a white gap between hero and content */
-  --content-offset: 3rem; /* additional downward offset for main content */
-}
+/* Small configurable gap note: use the variables above (see "Hero & layout variables")
+  to tune hero spacing. Avoid redefining the variables elsewhere to keep
+  a single source of truth. */
 
 .hero-banner {
   /* Fixed hero so it remains visually continuous under the semi-opaque nav.
@@ -497,7 +540,7 @@ html, body {
 
 @media (max-width: 640px) {
   .parallax-container .hero-text {
-    margin-top: var(--hero-text-offset-mobile, 1.25rem);
+    margin-top: var(--hero-text-offset);
   }
 }
 
