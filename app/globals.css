@@ -282,7 +282,16 @@ header.site-nav .brand {
 
 .hero-overlay h1,
 .hero-overlay p {
-  text-shadow: 0 1px 6px rgba(2,6,23,0.6);
+  /* stronger layered shadow to improve readability over complex hero images
+     - larger, softer halo for depth
+     - smaller, crisper shadow for legibility
+     - tiny light highlight to give a subtle lift on very dark backgrounds
+     - webkit text stroke for extra separation on supported browsers */
+  text-shadow: 0 2px 14px rgba(2,6,23,0.85),
+               0 1px 4px rgba(2,6,23,0.6),
+               0 1px 0 rgba(255,255,255,0.02);
+  -webkit-text-stroke: 0.35px rgba(0,0,0,0.14);
+  text-rendering: optimizeLegibility;
 }
 
 /* Content area immediately below the hero

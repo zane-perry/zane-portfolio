@@ -19,6 +19,12 @@ export default function RootLayout({
   const year = new Date().getFullYear();
   return (
     <html lang="en">
+      <head>
+        {/* Ensure browsers load the SVG favicon and provide fallbacks for older clients */}
+        <link rel="icon" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
+      </head>
       <body className="min-h-screen flex flex-col">
         <FadeProvider>
           <NavBar />
