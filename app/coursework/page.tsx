@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Coursework",
+  description:
+    "Coursework completed by Zane Perry across applied mathematics, computer science, statistics, biology, and engineering.",
+  alternates: { canonical: "https://zane-perry.com/coursework" }
+};
+
 const groups = [
   {
     title: "Core Mathematics",

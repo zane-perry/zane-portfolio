@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Zane Perry",
+  description: "Technical stack and design philosophy of Zane Perry's applied mathematics & machine learning portfolio site.",
+  alternates: { canonical: "https://zane-perry.com/about" }
+};
+
 export default function AboutPage() {
   return (
     <div className="section">
       <div className="mb-6">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold">About this Page</h1>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold">About Zane Perry&apos;s Site</h1>
         <p className="mt-3 text-sm text-slate-700 max-w-3xl">
           A short summary of the technologies used to build this site and the design
           choices that guided its look and behavior.

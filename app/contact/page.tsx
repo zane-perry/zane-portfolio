@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "Contact Zane Perry — email, LinkedIn, and GitHub links.",
+  alternates: { canonical: "https://zane-perry.com/contact" }
+};
+
 export default function ContactPage() {
   return (
     <div className="section">

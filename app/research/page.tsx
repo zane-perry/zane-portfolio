@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Research",
+  description:
+    "Research by Zane Perry — hybrid mechanistic machine learning models for genetic circuits and related directions.",
+  alternates: { canonical: "https://zane-perry.com/research" }
+};
+
 export default function ResearchPage() {
   return (
     <div className="section">
