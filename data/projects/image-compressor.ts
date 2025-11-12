@@ -1,11 +1,7 @@
 import type { ProjectDetail } from "./types.ts";
 
 export const imageCompressor: ProjectDetail = {
-  overview: `A MATLAB-based investigation comparing wavelet (Haar) compression with
-Singular Value Decomposition (SVD) based low-rank approximations for image compression and
-reconstruction. The project evaluates sparsity, storage efficiency, and perceptual fidelity to
-understand how orthogonal transforms and matrix factorizations translate into practical image
-compression techniques.`,
+  overview: `A MATLAB-based investigation comparing wavelet (Haar) compression with Singular Value Decomposition (SVD) based low-rank approximations for image compression and reconstruction. The project evaluates sparsity, storage efficiency, and perceptual fidelity to understand how orthogonal transforms and matrix factorizations translate into practical image compression techniques.`,
   sections: [
     {
       title: "Motivation & Background",

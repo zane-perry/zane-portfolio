@@ -87,10 +87,7 @@ export default function CourseworkPage() {
     <div className="section">
       <h1 className="section-title">Coursework</h1>
       <p className="section-subtitle">
-        I&apos;ve completed a uniquely broad and deep curriculum in applied
-        mathematics, computer science, and the natural sciences, with more than 200
-        credit hours. This page gives an overview of my completed coursework,
-        grouped by topic area.
+        I&apos;ve completed a uniquely broad and deep curriculum in applied mathematics, computer science, and the natural sciences, with more than 200 credit hours. This page gives an overview of my completed coursework, grouped by topic area.
       </p>
 
       <div className="grid gap-4 md:grid-cols-2">

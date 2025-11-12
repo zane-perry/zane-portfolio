@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useFade } from "@/components/FadeProvider";
 
@@ -10,6 +11,8 @@ let footerHasHydrated = false;
 export default function Footer() {
   const pathname = usePathname();
 
+  const footerRef = React.useRef<HTMLElement | null>(null);
+
   // Determine if this is the first client hydration of the session
   const isInitialSessionMount = !footerHasHydrated;
   useEffect(() => {
@@ -17,7 +20,8 @@ export default function Footer() {
   }, []);
 
   // Try to consume fade context; guard if provider not present
-  let fadeCtx: { isFadingOut: boolean } | null = null;
+  // include navigate in the type so we can call it from event handlers
+  let fadeCtx: { isFadingOut: boolean; navigate?: (href: string) => void } | null = null;
   try {
     fadeCtx = useFade();
   } catch (e) {
@@ -34,20 +38,42 @@ export default function Footer() {
   const animClass = isInitialSessionMount
     ? ""
     : (fadeCtx && fadeCtx.isFadingOut ? "footer-slide-out" : "footer-slide-in");
+  // hook to auto-fix footer for short pages
+  useFooterAutoFix(footerRef, pathname ?? null);
 
   return (
     // key by pathname to retrigger entrance on route change
-    <footer key={pathname} className={`site-footer ${animClass}`} style={inlineStyles}>
+    <footer
+      ref={footerRef}
+      key={pathname}
+  className={`site-footer ${animClass}`}
+      style={inlineStyles}
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 footer-inner">
-        <div className="text-sm text-slate-600">Zane Perry</div>
+        <div className="text-sm text-slate-600">
+          <Link
+            href="/about"
+            onClick={(e) => {
+              // if fade provider is available, use it for smooth nav (scroll up, fade out)
+              if (fadeCtx && typeof fadeCtx.navigate === 'function') {
+                e.preventDefault();
+                fadeCtx.navigate('/about');
+              }
+              // otherwise, let Next handle the navigation normally
+            }}
+            className="hover:underline"
+          >
+            About this Page
+          </Link>
+        </div>
         <div className="flex items-center gap-4">
           {/* GitHub */}
           <a
-            href="https://github.com/zane-perry"
+            href="https://github.com/zane-perry/zane-portfolio"
             target="_blank"
             rel="noreferrer"
             className="footer-icon"
-            aria-label="GitHub"
+            aria-label="GitHub Repository"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" aria-hidden>
               <path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.263.82-.583 0-.288-.01-1.05-.016-2.06-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.238 1.84 1.238 1.07 1.834 2.807 1.304 3.492.997.108-.776.418-1.305.76-1.605-2.665-.303-5.466-1.332-5.466-5.93 0-1.31.468-2.381 1.235-3.221-.123-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.984-.399 3.005-.404 1.02.005 2.048.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.241 2.873.118 3.176.77.84 1.234 1.911 1.234 3.221 0 4.61-2.803 5.624-5.475 5.922.43.372.815 1.102.815 2.222 0 1.606-.014 2.9-.014 3.293 0 .323.216.699.825.58C20.565 21.796 24 17.297 24 12 24 5.37 18.63 0 12 0z" />
@@ -81,4 +107,50 @@ export default function Footer() {
       </div>
     </footer>
   );
+}
+
+// Detect short pages and toggle fixed footer accordingly. We keep the logic
+// outside the component render path to avoid surprising behavior during SSR.
+// This hook runs on the client and updates the footer position when the
+// window resizes or when the route changes.
+function useFooterAutoFix(footerRef: React.RefObject<HTMLElement | null>, pathname: string | null) {
+  React.useEffect(() => {
+    if (!footerRef.current) return;
+
+    const footerEl = footerRef.current;
+    const contentEl = document.querySelector('.content-area') as HTMLElement | null;
+
+    function update() {
+      // measure total document height vs viewport height
+      const docH = document.documentElement.scrollHeight;
+      const viewH = window.innerHeight;
+      // small tolerance to account for sticky UI
+      const shouldFix = docH <= viewH + 4;
+
+      if (shouldFix) {
+        footerEl.classList.add('fixed-footer');
+        // ensure content area has bottom padding so content isn't hidden
+        if (contentEl) {
+          const h = footerEl.getBoundingClientRect().height;
+          contentEl.style.paddingBottom = `${h + 12}px`;
+        }
+      } else {
+        footerEl.classList.remove('fixed-footer');
+        if (contentEl) {
+          contentEl.style.paddingBottom = '';
+        }
+      }
+    }
+
+    // run initially
+    update();
+
+    // re-run on resize and when pathname changes
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('resize', update);
+      // cleanup padding
+      if (contentEl) contentEl.style.paddingBottom = '';
+    };
+  }, [footerRef, pathname]);
 }

@@ -1,11 +1,7 @@
 import type { ProjectDetail } from "./types.ts";
 
 export const airfoilSim: ProjectDetail = {
-  overview: `This project applies complex analysis and potential flow theory to model air
-flow over airfoils using conformal mappings and the Joukowsky transformation. By combining
-analytic functions with computational visualization, the work demonstrates how harmonic and
-potential functions can represent aerodynamic behavior and produce lift estimates without
-resorting to full CFD simulations.`,
+  overview: `This project applies complex analysis and potential flow theory to model air flow over airfoils using conformal mappings and the Joukowsky transformation. By combining analytic functions with computational visualization, the work demonstrates how harmonic and potential functions can represent aerodynamic behavior and produce lift estimates without resorting to full CFD simulations.`,
   sections: [
     {
       title: "Motivation & Background",

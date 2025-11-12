@@ -140,6 +140,16 @@ header.site-nav {
   backdrop-filter: blur(6px);
   /* small subtle shadow to separate nav from content when needed */
   box-shadow: 0 2px 8px rgba(2,6,23,0.04);
+  /* Make the header fully fixed so it never moves (including during overscroll)
+     - fixed keeps it pinned to the viewport top
+     - left/right/width ensure full-bleed layout like before
+     - keep a high z-index so it sits above hero and content */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 60;
 }
 
 /* ensure links in the nav remain highly legible */
@@ -268,12 +278,9 @@ header.site-nav .brand {
 }
 
 /* Ensure header (NavBar) stays above the hero and content */
+/* NOTE: We use a fixed header above. Keep the inner container matching the
+   configured nav height so layout doesn't change. */
 header.site-nav {
-  /* keep the nav sticky at the top and above the hero */
-  position: sticky;
-  top: 0;
-  z-index: 60;
-  /* only set the visual height here so internal layout (buttons) is unchanged */
   height: var(--nav-height);
 }
 
@@ -290,7 +297,8 @@ main {
   /* Keep the main content positioned below the hero. Add an extra offset
      so content starts further down (useful to expose more of the banner).
      Controlled by --content-offset (default 5rem). */
-  padding-top: calc(var(--hero-height) + var(--content-offset));
+  /* Add padding-top for the fixed header so content isn't hidden behind it. */
+  padding-top: calc(var(--hero-height) + var(--content-offset) + var(--nav-height));
 }
 
 /* Projects expanding-card animation styles */
@@ -368,8 +376,24 @@ main {
   /* use the accent gradient and ensure good contrast */
   background: var(--accent-gradient);
   color: white;
+  /* Default footer flows with document layout. For very short pages we add
+     a `fixed-footer` class (via JS) which pins the footer to the viewport
+     bottom. The default margin-top is preserved for regular pages. */
   margin-top: 3rem;
   border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Fixed variant (applied via JS when the page content is shorter than the
+   viewport). We pin the footer to the bottom and ensure it sits above
+   content/hero. Padding on the content area is added dynamically to avoid
+   overlap. */
+.site-footer.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 60;
 }
 .site-footer .footer-inner {
   display: flex;
@@ -382,6 +406,18 @@ main {
   /* reduce vertical padding to make the footer shorter while preserving horizontal padding */
   padding-top: 0.75rem !important;
   padding-bottom: 0.75rem !important;
+}
+
+/* Prevent rubber-band/overscroll from moving fixed header/footer. This keeps
+   fixed UI elements visually locked during OS-level overscroll. */
+html, body {
+  overscroll-behavior: none;
+}
+
+/* Also contain overscroll inside the main content area for better control
+   (useful if there are inner scrollable regions). */
+.content-area {
+  overscroll-behavior: contain;
 }
 
 .site-footer .footer-inner .text-sm {

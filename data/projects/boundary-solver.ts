@@ -1,12 +1,7 @@
 import type { ProjectDetail } from "./types.ts";
 
 export const boundarySolver: ProjectDetail = {
-  overview: `A numerically stable and highly accurate framework for solving boundary value
-problems by reformulating them as boundary integral equations rather than relying on mesh-based
-finite difference or finite element discretizations. By converting differential operators into
-integral operators using Green's functions and fundamental solutions, the method confines
-numerical error to integration and obtains superior conditioning and accuracy, even on
-irregular geometries.`,
+  overview: `A numerically stable and highly accurate framework for solving boundary value problems by reformulating them as boundary integral equations rather than relying on mesh-based finite difference or finite element discretizations. By converting differential operators into integral operators using Green's functions and fundamental solutions, the method confines numerical error to integration and obtains superior conditioning and accuracy, even on irregular geometries.`,
   sections: [
     {
       title: "Motivation & Background",

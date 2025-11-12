@@ -3,8 +3,7 @@ export default function ContactPage() {
     <div className="section">
       <h1 className="section-title">Contact</h1>
       <p className="section-subtitle">
-        Ways to get in touch or find more about my work. Later you can upgrade
-        this section with a form or scheduling links.
+        Ways to get in touch or find more about my work.
       </p>
 
   <div className="card space-y-3 text-sm text-slate-700">

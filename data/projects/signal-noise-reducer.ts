@@ -1,11 +1,7 @@
 import type { ProjectDetail } from "./types.ts";
 
 export const signalNoiseReducer: ProjectDetail = {
-  overview: `Investigation and implementation of rank-revealing factorizations (RRFs) —
-specifically rank-revealing QR (RRQRF) — as an efficient method to detect numerical rank and
-build low-rank approximations for signal denoising and reduced-order modeling. The project
-focuses on QR with column pivoting as a faster alternative to SVD for large matrices, and
-demonstrates an applied signal separation use-case inspired by music and speech enhancement.`,
+  overview: `Investigation and implementation of rank-revealing factorizations (RRFs) — specifically rank-revealing QR (RRQRF) — as an efficient method to detect numerical rank and build low-rank approximations for signal denoising and reduced-order modeling. The project focuses on QR with column pivoting as a faster alternative to SVD for large matrices, and demonstrates an applied signal separation use-case inspired by music and speech enhancement.`,
   sections: [
     {
       title: "Motivation",
