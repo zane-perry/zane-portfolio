@@ -12,12 +12,14 @@ export default function Footer() {
   const pathname = usePathname();
 
   const footerRef = React.useRef<HTMLElement | null>(null);
+  const [isFixed, setIsFixed] = React.useState(false);
 
   // Determine if this is the first client hydration of the session
   const isInitialSessionMount = !footerHasHydrated;
   useEffect(() => {
     footerHasHydrated = true;
   }, []);
+ 
 
   // Try to consume fade context; guard if provider not present
   // include navigate in the type so we can call it from event handlers
@@ -27,6 +29,29 @@ export default function Footer() {
   } catch (e) {
     fadeCtx = null;
   }
+
+  // If this is a full page load (initial session mount), delay the footer
+  // slide-in so it matches the rest of the page entrance timing. Respect
+  // user's reduced-motion preference.
+  React.useEffect(() => {
+    if (!isInitialSessionMount) return;
+    if (typeof window === 'undefined') return;
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    const el = footerRef.current;
+    const t = setTimeout(() => {
+      if (!el) return;
+      // only add the slide-in if not currently fading out
+      if (!(fadeCtx && fadeCtx.isFadingOut)) {
+        el.classList.remove('footer-slide-out');
+        el.classList.remove('initial-footer-hidden');
+        el.classList.add('footer-slide-in');
+      }
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [isInitialSessionMount, fadeCtx]);
+  
 
   // On client navigations (not first hydration), apply quicker slide animation
   const navDelay = "100ms";
@@ -38,15 +63,37 @@ export default function Footer() {
   const animClass = isInitialSessionMount
     ? ""
     : (fadeCtx && fadeCtx.isFadingOut ? "footer-slide-out" : "footer-slide-in");
-  // hook to auto-fix footer for short pages
-  useFooterAutoFix(footerRef, pathname ?? null);
+  // hook to auto-fix footer for short pages; pass initial mount flag so the
+  // hook won't immediately play the slide-in on a fresh full-page reload.
+  useFooterAutoFix(footerRef, pathname ?? null, setIsFixed, isInitialSessionMount);
+
+  // When fading out (navigation) force slide-out class; when not, ensure slide-in present.
+  useEffect(() => {
+    // Avoid interfering with the initial full-page delayed entrance. The
+    // initial mount has a separate delayed effect that will add the
+    // 'footer-slide-in' after 2000ms; we don't want to add it immediately.
+    if (isInitialSessionMount) return;
+
+    const el = footerRef.current;
+    if (!el) return;
+    if (fadeCtx?.isFadingOut) {
+      el.classList.remove('footer-slide-in');
+      el.classList.add('footer-slide-out');
+    } else {
+      // only add slide-in if not already sliding out; avoids flicker
+      if (!el.classList.contains('footer-slide-in')) {
+        el.classList.remove('footer-slide-out');
+        el.classList.add('footer-slide-in');
+      }
+    }
+  }, [fadeCtx?.isFadingOut, isInitialSessionMount]);
 
   return (
     // key by pathname to retrigger entrance on route change
     <footer
       ref={footerRef}
       key={pathname}
-  className={`site-footer ${animClass}`}
+      className={`site-footer ${isFixed ? 'fixed-footer' : ''} ${animClass} ${isInitialSessionMount ? 'initial-footer-hidden' : ''}`}
       style={inlineStyles}
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 footer-inner">
@@ -113,12 +160,18 @@ export default function Footer() {
 // outside the component render path to avoid surprising behavior during SSR.
 // This hook runs on the client and updates the footer position when the
 // window resizes or when the route changes.
-function useFooterAutoFix(footerRef: React.RefObject<HTMLElement | null>, pathname: string | null) {
+function useFooterAutoFix(
+  footerRef: React.RefObject<HTMLElement | null>,
+  pathname: string | null,
+  onFixedChange?: (isFixed: boolean) => void,
+  initialMount?: boolean
+) {
   React.useEffect(() => {
     if (!footerRef.current) return;
 
     const footerEl = footerRef.current;
     const contentEl = document.querySelector('.content-area') as HTMLElement | null;
+    let lastFixed = footerEl.classList.contains('fixed-footer');
 
     function update() {
       // measure total document height vs viewport height
@@ -128,7 +181,20 @@ function useFooterAutoFix(footerRef: React.RefObject<HTMLElement | null>, pathna
       const shouldFix = docH <= viewH + 4;
 
       if (shouldFix) {
+        // if transitioning from non-fixed to fixed, ensure we animate the entrance
+        const wasFixed = footerEl.classList.contains('fixed-footer');
         footerEl.classList.add('fixed-footer');
+        if (!wasFixed) {
+          // trigger slide-in animation for fixed footer on short pages unless
+          // this is the initial full page load (we will add the delayed
+          // entrance from the parent component in that case)
+          if (!initialMount) {
+            footerEl.classList.remove('footer-slide-out');
+            footerEl.classList.add('footer-slide-in');
+          }
+        }
+        lastFixed = true;
+        onFixedChange && onFixedChange(true);
         // ensure content area has bottom padding so content isn't hidden
         if (contentEl) {
           const h = footerEl.getBoundingClientRect().height;
@@ -139,6 +205,8 @@ function useFooterAutoFix(footerRef: React.RefObject<HTMLElement | null>, pathna
         if (contentEl) {
           contentEl.style.paddingBottom = '';
         }
+        lastFixed = false;
+        onFixedChange && onFixedChange(false);
       }
     }
 
