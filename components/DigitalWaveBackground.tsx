@@ -47,7 +47,7 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
   const scrollRef = useScrollRef();
   const { xRef: mouseX, yRef: mouseY } = useMouseRef();
   // read fade state if provider is present; guard if not
-  let fadeCtx: { isFadingOut: boolean } | null = null;
+  let fadeCtx: { isFadingOut: boolean; isNavigating?: boolean } | null = null;
   try { fadeCtx = useFade(); } catch { fadeCtx = null; }
   const isFadingOut = !!(fadeCtx && fadeCtx.isFadingOut);
   // keep component mounted across navigations to avoid fade reset
@@ -101,6 +101,13 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
       if (!canvasRef.current || !rendererRef.current) return;
       // During fade-out, ignore resizes to keep waves static
       if (isFadingOut) return;
+      // sync cached size on explicit resizes
+      const el = containerRef.current || canvasRef.current;
+      const rect = el.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(rect.width));
+      const h = Math.max(1, Math.floor(rect.height));
+      lastStableRef.current = { w, h };
+      lastSizeRef.current = { w, h };
       rendererRef.current.resize();
     };
     window.addEventListener('resize', handleResize);
@@ -150,8 +157,7 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
     const w = Math.max(1, Math.floor(rect.width));
     const h = Math.max(1, Math.floor(rect.height));
     // Update last stable size only when not fading and the size hasn't collapsed dramatically
-    const prevStable = lastStableRef.current;
-    const collapsed = h < 32 || w < 32 || (prevStable.h > 0 && h < prevStable.h * 0.6);
+    const collapsed = h < 32 || w < 32;
     if (!isFadingOut && !collapsed) {
       lastSizeRef.current = { w, h };
       lastStableRef.current = { w, h };
@@ -188,10 +194,9 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
     const ro = new ResizeObserver(() => {
       if (isFadingOut) return; // freeze during fade
       const rect = el.getBoundingClientRect();
-      const w = Math.floor(rect.width);
-      const h = Math.floor(rect.height);
-      const prevStable = lastStableRef.current;
-      const collapsed = h < 32 || w < 32 || (prevStable.h > 0 && h < prevStable.h * 0.6);
+      const w = Math.max(1, Math.floor(rect.width));
+      const h = Math.max(1, Math.floor(rect.height));
+      const collapsed = h < 32 || w < 32;
       if (!collapsed) {
         lastStableRef.current = { w, h };
         r.resize();
@@ -199,6 +204,20 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
     });
     ro.observe(el);
     return () => ro.disconnect();
+  }, [isFadingOut]);
+
+  // After navigation completes / fade-out ends, force a re-measure and resize so band count matches the new page height
+  useEffect(() => {
+    if (isFadingOut) return;
+    const el = containerRef.current || canvasRef.current;
+    const r = rendererRef.current;
+    if (!el || !r) return;
+    const rect = el.getBoundingClientRect();
+    const w = Math.max(1, Math.floor(rect.width));
+    const h = Math.max(1, Math.floor(rect.height));
+    lastStableRef.current = { w, h };
+    lastSizeRef.current = { w, h };
+    r.resize();
   }, [isFadingOut]);
 
   return (
