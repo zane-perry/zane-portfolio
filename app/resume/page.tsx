@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Resume",
+  description: "Download or view the resume of Zane Perry — applied mathematics and machine learning.",
+  alternates: { canonical: "https://zane-perry.com/resume" }
+};
+
 export default function ResumePage() {
   return (
     <div className="section">

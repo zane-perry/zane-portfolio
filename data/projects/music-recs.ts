@@ -1,11 +1,7 @@
 import type { ProjectDetail } from "./types.ts";
 
 export const musicRecs: ProjectDetail = {
-  overview: `This project explores how deep learning and classical signal processing can be
-combined to improve the accuracy and interpretability of music recommendation systems. Unlike
-traditional approaches that depend heavily on metadata or collaborative signals, this work
-focuses on the music itself — analyzing acoustic and temporal structure to infer listener
-preferences directly from sound.`,
+  overview: `This project explores how deep learning and classical signal processing can be combined to improve the accuracy and interpretability of music recommendation systems. Unlike traditional approaches that depend heavily on metadata or collaborative signals, this work focuses on the music itself — analyzing acoustic and temporal structure to infer listener preferences directly from sound.`,
   sections: [
     {
       title: "Motivation",

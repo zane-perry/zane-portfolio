@@ -28,13 +28,6 @@ const projects = [
     status: "Presentation, Report, Code available"
   },
   {
-    title: "Airfoil Fluid Simulation",
-    role: "Simulation / Real Data",
-    summary: "Computational fluid dynamics simulations for airfoil design and analysis.",
-    tags: ["CFD", "Simulation", "Matlab"],
-    status: "Presentation, Report available"
-  },
-  {
     title: "Signal Noise Reducer",
     role: "Signal Processing",
     summary: "Algorithms to denoise audio signals using rank-revealing linear algebra techniques.",
@@ -42,11 +35,11 @@ const projects = [
     status: "Presentation, Report, Code available"
   },
   {
-    title: "Travel Planning Guide",
-    role: "Utility / Web App",
-    summary: "A travel itinerary planner with ticket booking functionality, weather information, and an interactive calendar.",
-    tags: ["Express", "APIs", "Group Project"],
-    status: "Code available"
+    title: "Airfoil Fluid Simulation",
+    role: "Simulation / Real Data",
+    summary: "Computational fluid dynamics simulations for airfoil design and analysis.",
+    tags: ["CFD", "Simulation", "Matlab"],
+    status: "Presentation, Report available"
   },
   {
     title: "Image Compressor",
@@ -54,6 +47,13 @@ const projects = [
     summary: "Compression of images using discrete wavelet transforms and SVD techniques.",
     tags: ["Signal Processing", "Linear Algebra"],
     status: "Report available"
+  },
+  {
+    title: "Travel Planning Guide",
+    role: "Utility / Web App",
+    summary: "A travel itinerary planner with ticket booking functionality, weather information, and an interactive calendar.",
+    tags: ["Express", "APIs", "Group Project"],
+    status: "Code available"
   },
   {
     title: "Minigit File Version Control",

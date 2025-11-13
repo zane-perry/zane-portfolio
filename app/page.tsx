@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Zane Perry — Applied Math & ML",
+  description:
+    "Portfolio homepage for Zane Perry — applied mathematics, machine learning, and software engineering.",
+  alternates: { canonical: "https://zane-perry.com/" }
+};
+
 export default function HomePage() {
   return (
     <div className="section">

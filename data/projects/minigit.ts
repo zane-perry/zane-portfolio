@@ -1,10 +1,7 @@
 import type { ProjectDetail } from "./types.ts";
 
 export const minigit: ProjectDetail = {
-  overview: `Design and implementation of a lightweight version control system (VCS) implemented
-from first principles to illuminate the inner workings of modern VCS tools. The project
-provides a CLI that supports repository initialization, staging, commits, branching, checkout,
-and merging—demonstrating snapshot storage, content-addressable objects, and revision graphs.`,
+  overview: `Design and implementation of a lightweight version control system (VCS) implemented from first principles to illuminate the inner workings of modern VCS tools. The project provides a CLI that supports repository initialization, staging, commits, branching, checkout, and merging—demonstrating snapshot storage, content-addressable objects, and revision graphs.`,
   sections: [
     {
       title: "Project Focus & Responsibilities",
