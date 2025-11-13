@@ -687,6 +687,24 @@ html, body {
   will-change: opacity, transform;
 }
 
+/* Effects toggle delayed fade-in */
+@keyframes effectsToggleFadeIn {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.effects-toggle {
+  opacity: 0;
+  animation-name: effectsToggleFadeIn;
+  animation-duration: 900ms;
+  animation-delay: 2800ms; /* fair delay before showing the button */
+  animation-timing-function: cubic-bezier(.2,.9,.2,1);
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+  .effects-toggle { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
 /* ScrollReveal utility classes applied via JS for out-of-viewport content */
 .sr-hidden {
   opacity: 0;

@@ -1,12 +1,51 @@
 "use client";
 import React from "react";
+import { createPortal } from "react-dom";
 import { useBackgroundEffects } from "./BackgroundEffectsProvider";
 
 export default function BackgroundToggle() {
   const { enabled, toggle } = useBackgroundEffects();
+  const [bottomOffset, setBottomOffset] = React.useState<number>(24); // px; Tailwind bottom-6 ≈ 24px
+  const [mounted, setMounted] = React.useState(false);
 
-  return (
-    <div className="fixed bottom-6 right-6 z-50">
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  React.useEffect(() => {
+    const footer = document.querySelector('.site-footer') as HTMLElement | null;
+    if (!footer) return;
+
+    const base = 24; // default spacing from viewport bottom (px)
+    const update = () => {
+      const isFixed = footer.classList.contains('fixed-footer');
+      if (isFixed) {
+        const h = footer.getBoundingClientRect().height || 0;
+        setBottomOffset(Math.round(h + 16)); // keep ~16px gap above footer
+      } else {
+        setBottomOffset(base);
+      }
+    };
+
+    // Observe class changes on the footer so we react when it becomes fixed/unfixed
+    const mo = new MutationObserver(update);
+    mo.observe(footer, { attributes: true, attributeFilter: ['class'] });
+
+    // Also update on resize as footer height may change
+    window.addEventListener('resize', update);
+    // initial run
+    update();
+    return () => {
+      mo.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  const node = (
+    <div
+      className="effects-toggle fixed right-6 pointer-events-auto"
+      style={{ bottom: bottomOffset, zIndex: 1000000 }}
+    >
       <button
         aria-pressed={!enabled}
         onClick={toggle}
@@ -23,4 +62,8 @@ export default function BackgroundToggle() {
       </button>
     </div>
   );
+
+  // Avoid SSR/early render mismatch; only portal on client when body exists
+  if (!mounted || typeof document === 'undefined') return null;
+  return createPortal(node, document.body);
 }
