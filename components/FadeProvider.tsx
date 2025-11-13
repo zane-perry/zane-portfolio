@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 type FadeContextType = {
   navigate: (href: string) => void;
   isFadingOut: boolean;
+  isNavigating: boolean;
 };
 
 const FadeContext = createContext<FadeContextType | undefined>(undefined);
@@ -19,6 +20,7 @@ export function useFade() {
 export default function FadeProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // duration should match the CSS animation we add in globals.css (200ms)
   const FADE_OUT_MS = 200;
@@ -26,6 +28,9 @@ export default function FadeProvider({ children }: { children: React.ReactNode }
   const navigate = useCallback(async (href: string) => {
     // If already fading, ignore repeated requests
     if (isFadingOut) return;
+    // Mark that a navigation cycle is in progress. This persists across
+    // the route change so newly mounted pages can start hidden.
+    setIsNavigating(true);
     // Scroll to top first (we want the fade to happen after scrolling).
     const canSmooth = typeof window !== 'undefined' && window.matchMedia && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -65,12 +70,24 @@ export default function FadeProvider({ children }: { children: React.ReactNode }
     setIsFadingOut(true);
     setTimeout(() => {
       router.push(href);
+      // End the fade-out state immediately after triggering navigation.
       setIsFadingOut(false);
+      // Give the new route a tiny window to mount while kept hidden, then
+      // release the navigation hold so it can animate in.
+      if (typeof window !== 'undefined') {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setIsNavigating(false);
+          });
+        });
+      } else {
+        setIsNavigating(false);
+      }
     }, FADE_OUT_MS);
   }, [isFadingOut, router]);
 
   return (
-    <FadeContext.Provider value={{ navigate, isFadingOut }}>
+    <FadeContext.Provider value={{ navigate, isFadingOut, isNavigating }}>
       {children}
     </FadeContext.Provider>
   );

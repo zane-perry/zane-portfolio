@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useFade } from "@/components/FadeProvider";
 import { usePathname } from "next/navigation";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -21,6 +21,7 @@ let hasHydrated = false;
 export default function PageFade({ children }: Props) {
   const pathname = usePathname();
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const mountedRef = useRef(false);
 
   // shorter delay/duration for route changes vs initial load
   const navDelay = "100ms";
@@ -34,6 +35,7 @@ export default function PageFade({ children }: Props) {
 
   useEffect(() => {
     hasHydrated = true;
+    mountedRef.current = true;
   }, []);
 
   // On a full page load / first client hydration, ensure the viewport is at
@@ -61,18 +63,24 @@ export default function PageFade({ children }: Props) {
   // If a fade provider is present, use its fade-out state to apply the
   // `.fade-out` class when navigating away. Provider may be absent during
   // server-side previews; guard against missing context.
-  let fadeCtx: { isFadingOut: boolean } | null = null;
+  let fadeCtx: { isFadingOut: boolean; isNavigating: boolean } | null = null;
   try {
     fadeCtx = useFade();
   } catch (e) {
     fadeCtx = null;
   }
 
-  const inlineStyles = isInitialSessionMount || (fadeCtx && fadeCtx.isFadingOut)
-    ? undefined
-    : { animationDelay: navDelay, animationDuration: navDuration };
+  // Only apply fade-out to components that were already mounted (leaving page).
+  const isLeaving = !!(fadeCtx && fadeCtx.isFadingOut && mountedRef.current);
 
-  const wrapperClass = `section ${fadeCtx && fadeCtx.isFadingOut ? 'fade-out' : 'fade-in'}`;
+  // During client navigations, start with shorter fade-in timings.
+  const inlineStyles: React.CSSProperties | undefined =
+    isInitialSessionMount || isLeaving
+      ? undefined
+      : { animationDelay: navDelay, animationDuration: navDuration, animationPlayState: fadeCtx?.isNavigating ? 'paused' as const : undefined };
+
+  // New pages should never render with fade-out; guard with isLeaving.
+  const wrapperClass = `section ${isLeaving ? 'fade-out' : 'fade-in'}`;
 
   // Prevent parent collapse during fade-out to keep sibling absolute layers (e.g., background)
   // from flickering due to height going to zero.
