@@ -5,7 +5,7 @@ import HeroParallax from "@/components/HeroParallax";
 import PageFade from "@/components/PageFade";
 import FadeProvider from "@/components/FadeProvider";
 import Footer from "@/components/Footer";
-import DigitalWaveBackground from "@/components/DigitalWaveBackground";
+import BackgroundEffectsRoot from "@/components/BackgroundEffectsRoot";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://zane-perry.com"),
@@ -116,7 +116,7 @@ export default function RootLayout({
             <div className="content-area">
               {/* Wave background sits above base background and behind content cards */}
               <div className="relative">
-                <DigitalWaveBackground className="z-0" />
+                <BackgroundEffectsRoot />
                 <div className="relative z-10">
                   {/* PageFade handles entry animations on mount. */}
                   <PageFade>{children}</PageFade>

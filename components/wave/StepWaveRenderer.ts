@@ -26,6 +26,7 @@ export type WaveRendererOptions = {
   mouseRadius?: number; // radius (px) for local mouse bump influence along X
   mouseBump?: number; // additive bump amount before quantization (0..1 typical)
   reducedMotion?: boolean;
+  renderMode?: "stepped" | "smooth"; // rendering style for the wave path
 };
 
 export type WaveDynamicInputs = {
@@ -43,6 +44,7 @@ export class StepWaveRenderer {
   private opts: WaveRendererOptions;
   private phase = 0; // radians
   private lastT = 0; // ms
+  private bandSeed = Math.random() * 1000; // stable-ish seed per instance for band tilt
 
   constructor(canvas: HTMLCanvasElement, opts: WaveRendererOptions) {
     const ctx = canvas.getContext("2d");
@@ -53,13 +55,23 @@ export class StepWaveRenderer {
     this.configure();
   }
 
+  // Re-randomize band tilt seed (e.g., on route changes to vary appearance)
+  reseedTilt(seed?: number) {
+    this.bandSeed = (seed ?? Math.random()) * 1000;
+  }
+
   configure(next?: Partial<WaveRendererOptions>) {
     if (next) this.opts = { ...this.opts, ...next };
     // apply DPR-aware sizing each configure
     this.dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     const rect = this.canvas.getBoundingClientRect();
-    this.canvas.width = Math.round(rect.width * this.dpr);
-    this.canvas.height = Math.round(rect.height * this.dpr);
+    // Avoid resizing to extremely small sizes during transient layout changes
+    const cssW = Math.floor(rect.width);
+    const cssH = Math.floor(rect.height);
+    if (cssW >= 16 && cssH >= 16) {
+      this.canvas.width = Math.round(cssW * this.dpr);
+      this.canvas.height = Math.round(cssH * this.dpr);
+    }
   }
 
   resize() {
@@ -122,11 +134,16 @@ export class StepWaveRenderer {
   const effectiveBands = Math.max(1, bandSpacing ? Math.floor(usableH / Math.max(40, bandSpacing)) : bands);
   const bandsGap = bandSpacing ? bandSpacing : (usableH / effectiveBands);
 
-    // Mouse influence: small localized amplitude bump near the cursor
-    const mx = dyn.mouseX;
-    const my = dyn.mouseY - (window.scrollY || 0); // convert to viewport Y
+    // Mouse influence: convert page coords to canvas-local CSS pixel coords
+    const rect = this.canvas.getBoundingClientRect();
+    const mxViewport = dyn.mouseX - (window.scrollX || 0);
+    const myViewport = dyn.mouseY - (window.scrollY || 0);
+    const mx = mxViewport - rect.left;
+    const my = myViewport - rect.top;
   const sigmaXGlobal = Math.max(20, mouseRadius);
   const sigmaYGlobal = Math.max(12, mouseRadius * 0.6);
+
+    const centerX = dyn.viewportW * 0.5;
 
     for (let layer = 0; layer < Math.max(1, layers); layer++) {
       const layerT = layer / Math.max(1, layers - 1);
@@ -144,8 +161,11 @@ export class StepWaveRenderer {
       const layerFreq = frequency * (1 + layerT * 0.1);
 
       for (let b = 0; b < effectiveBands; b++) {
-  const bandCenterY = bandTopOffset + (b + 0.5) * bandsGap + (reducedMotion ? 0 : scrollYOffset * (0.2 + b * 0.06));
-        const dy = my - bandCenterY;
+        const bandCenterY = bandTopOffset + (b + 0.5) * bandsGap + (reducedMotion ? 0 : scrollYOffset * (0.2 + b * 0.06));
+        const tiltSlope = this.bandTiltSlope(b); // px Y per px X
+        // compute proximity to the tilted band at the mouse X
+        const bandYAtMouse = bandCenterY + tiltSlope * (mx - centerX);
+        const dy = my - bandYAtMouse;
         const bandProx = Math.exp(-(dy * dy) / (2 * sigmaYGlobal * sigmaYGlobal));
         const amp = layerAmp * (1 + 0.25 * mouseStrength * bandProx);
 
@@ -153,7 +173,8 @@ export class StepWaveRenderer {
         ctx.shadowColor = stroke;
         ctx.shadowBlur = 8 * mouseStrength * bandProx;
 
-        this.drawSteppedWave(ctx, {
+        const renderMode = this.opts.renderMode || "stepped";
+        (renderMode === "smooth" ? this.drawSmoothWave : this.drawSteppedWave).call(this, ctx, {
           width: dyn.viewportW,
           height: dyn.viewportH,
           yCenter: bandCenterY,
@@ -166,6 +187,8 @@ export class StepWaveRenderer {
           mouseStrength,
           mouseRadius: sigmaXGlobal,
           mouseBump,
+          tiltSlope,
+          centerX,
         });
 
         // reset per-band shadow to avoid leaking to next bands if influence small
@@ -191,9 +214,11 @@ export class StepWaveRenderer {
       mouseStrength: number;
       mouseRadius: number; // sigmaX
       mouseBump: number;
+      tiltSlope: number; // px Y per px X
+      centerX: number; // pivot X for tilt
     }
   ) {
-    const { width: W, yCenter, phase, amplitude, frequency, quantLevels, mouseX, mouseY, mouseStrength, mouseRadius, mouseBump } = args;
+    const { width: W, yCenter, phase, amplitude, frequency, quantLevels, mouseX, mouseY, mouseStrength, mouseRadius, mouseBump, tiltSlope, centerX } = args;
 
     // Choose a sample step that balances performance and fidelity
     const sampleStep = 8; // px between sample points in CSS pixels
@@ -213,10 +238,12 @@ export class StepWaveRenderer {
       const t = 2 * Math.PI * frequency * (x / W) + phase;
       // local bump based on proximity to mouse in canvas coordinates
       const dx = x - mouseX;
-      const dy = yCenter - (mouseY - (window.scrollY || 0));
+      const dy = yCenter - mouseY;
       const localInfluence = Math.exp(-(dx * dx) / (2 * sigmaX * sigmaX)) * Math.exp(-(dy * dy) / (2 * sigmaY * sigmaY));
       const base = Math.sin(t) + mouseBump * mouseStrength * localInfluence; // add before quantization
-      const y = yCenter + q(base) * amplitude;
+      let y = yCenter + q(base) * amplitude;
+      // apply slight tilt around centerX to make the band diagonal
+      y += tiltSlope * (x - centerX);
 
       if (i === 0) {
         ctx.moveTo(x, y);
@@ -234,6 +261,66 @@ export class StepWaveRenderer {
       prevX = x;
     }
     ctx.stroke();
+  }
+
+  private drawSmoothWave(
+    ctx: CanvasRenderingContext2D,
+    args: {
+      width: number;
+      height: number;
+      yCenter: number;
+      phase: number; // radians
+      amplitude: number; // px
+      frequency: number; // cycles per viewport width
+      quantLevels: number;
+      mouseX: number;
+      mouseY: number;
+      mouseStrength: number;
+      mouseRadius: number; // sigmaX
+      mouseBump: number;
+      tiltSlope: number; // px Y per px X
+      centerX: number; // pivot X for tilt
+    }
+  ) {
+    const { width: W, yCenter, phase, amplitude, frequency, mouseX, mouseY, mouseStrength, mouseRadius, mouseBump, tiltSlope, centerX } = args;
+    // More samples for smoother curve
+    const sampleStep = 10; // px between sample points
+    const samples = Math.max(4, Math.floor(W / sampleStep));
+
+    ctx.beginPath();
+    ctx.lineJoin = 'round';
+    const sigmaX = Math.max(16, mouseRadius);
+    const sigmaY = Math.max(10, mouseRadius * 0.6);
+    for (let i = 0; i <= samples; i++) {
+      const x = (i / samples) * W;
+      const t = 2 * Math.PI * frequency * (x / W) + phase;
+      const dx = x - mouseX;
+      const dy = yCenter - mouseY;
+      const localInfluence = Math.exp(-(dx * dx) / (2 * sigmaX * sigmaX)) * Math.exp(-(dy * dy) / (2 * sigmaY * sigmaY));
+      // No quantization for smooth mode
+      const base = Math.sin(t) + mouseBump * mouseStrength * localInfluence;
+      let y = yCenter + base * amplitude;
+      y += tiltSlope * (x - centerX);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Deterministic small tilt per band using a hash of band index and seed
+  private bandTiltSlope(bandIndex: number) {
+    // max angle in radians ~ 1.5 degrees
+    const maxAngleRad = (5 * Math.PI) / 180;
+    const r = this.hash01(bandIndex + this.bandSeed * 13.37);
+    const angle = (r - 0.5) * 2 * maxAngleRad; // [-max, max]
+    const slope = Math.tan(angle);
+    return slope;
+  }
+
+  private hash01(x: number) {
+    // simple hash -> [0,1)
+    const s = Math.sin(x * 12.9898 + 78.233) * 43758.5453;
+    return s - Math.floor(s);
   }
 }
 

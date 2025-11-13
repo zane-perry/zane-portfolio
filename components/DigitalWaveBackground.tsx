@@ -4,11 +4,12 @@ import { StepWaveRenderer, type WaveRendererOptions } from "@/components/wave/St
 import { useRaf } from "@/components/wave/hooks/useRaf";
 import { useScrollRef } from "@/components/wave/hooks/useScrollRef";
 import { useMouseRef } from "@/components/wave/hooks/useMouseRef";
+import { useFade } from "@/components/FadeProvider";
 // pathname not required anymore; keep the component mounted across navigations
 
 export type DigitalWaveBackgroundProps = Partial<Pick<
   WaveRendererOptions,
-  "bands" | "bandSpacing" | "bandTopOffset" | "bandBottomOffset" | "layers" | "baseSpeed" | "amplitude" | "frequency" | "opacity" | "quantLevels" | "lineWidth" | "mouseStrength" | "scrollStrength" | "mouseRadius" | "mouseBump"
+  "bands" | "bandSpacing" | "bandTopOffset" | "bandBottomOffset" | "layers" | "baseSpeed" | "amplitude" | "frequency" | "opacity" | "quantLevels" | "lineWidth" | "mouseStrength" | "scrollStrength" | "mouseRadius" | "mouseBump" | "renderMode"
 >> & {
   className?: string;
   scrollFade?: boolean; // optional fade-out while scrolling
@@ -20,7 +21,7 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
   const {
     bands = 5,
     bandSpacing = 300, // px between band centers; determines band count based on container height
-    bandTopOffset = 150, // space from top before first band
+    bandTopOffset = 115, // space from top before first band
     bandBottomOffset = 100, // space from bottom after last band
     layers = 3,
     baseSpeed = 20, // px/sec drift (subtle)
@@ -28,23 +29,55 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
     frequency = 8.0, // cycles per viewport width
     opacity = 0.1,
     quantLevels = 12,
-    lineWidth = 1.25,
+    lineWidth = 2,
     mouseStrength = 1.0,
     scrollStrength = 10.0,
     mouseRadius = 120,
     mouseBump = 0.05,
     scrollFade = false,
-    className = ""
+    className = "",
+    renderMode = "smooth"
   } = props;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<StepWaveRenderer | null>(null);
+  const lastSizeRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
+  const lastStableRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
   const scrollRef = useScrollRef();
   const { xRef: mouseX, yRef: mouseY } = useMouseRef();
+  // read fade state if provider is present; guard if not
+  let fadeCtx: { isFadingOut: boolean } | null = null;
+  try { fadeCtx = useFade(); } catch { fadeCtx = null; }
+  const isFadingOut = !!(fadeCtx && fadeCtx.isFadingOut);
   // keep component mounted across navigations to avoid fade reset
 
-  // We no longer distinguish initial vs navigation; use a single slow fade.
+  // Control background fade to match content: fade-out on navigate, fade-in after.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const restartWaveFadeIn = () => {
+      el.classList.remove('fade-out');
+      // Restart wave fade-in animation by toggling the class
+      el.classList.remove('wave-fade');
+      // force reflow so the animation restarts
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      void el.offsetHeight;
+      el.classList.add('wave-fade');
+    };
+    if (isFadingOut) {
+      // fade out in sync with content
+      el.classList.remove('wave-fade');
+      el.classList.add('fade-out');
+    } else {
+      // navigation finished: fade back in like initial load
+      // re-randomize band tilt so the pattern feels fresh each navigation
+      if (rendererRef.current && typeof (rendererRef.current as any).reseedTilt === 'function') {
+        (rendererRef.current as any).reseedTilt();
+      }
+      restartWaveFadeIn();
+    }
+  }, [isFadingOut]);
 
   const reducedMotion = useMemo(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return false;
@@ -66,11 +99,13 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
   useEffect(() => {
     const handleResize = () => {
       if (!canvasRef.current || !rendererRef.current) return;
+      // During fade-out, ignore resizes to keep waves static
+      if (isFadingOut) return;
       rendererRef.current.resize();
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isFadingOut]);
 
   // Initialize renderer once
   useEffect(() => {
@@ -94,7 +129,8 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
       scrollStrength,
       mouseRadius,
       mouseBump,
-      reducedMotion
+      reducedMotion,
+      renderMode
     };
     const renderer = new StepWaveRenderer(canvas, opts);
     rendererRef.current = renderer;
@@ -110,12 +146,24 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
     const c = canvasRef.current;
     if (!r || !c) return;
     const rect = c.getBoundingClientRect();
+    // Clamp to last known non-trivial size to avoid transient 0x0 during transitions
+    const w = Math.max(1, Math.floor(rect.width));
+    const h = Math.max(1, Math.floor(rect.height));
+    // Update last stable size only when not fading and the size hasn't collapsed dramatically
+    const prevStable = lastStableRef.current;
+    const collapsed = h < 32 || w < 32 || (prevStable.h > 0 && h < prevStable.h * 0.6);
+    if (!isFadingOut && !collapsed) {
+      lastSizeRef.current = { w, h };
+      lastStableRef.current = { w, h };
+    }
+    const vw = (lastSizeRef.current.w || w);
+    const vh = (lastSizeRef.current.h || h);
     r.drawFrame(t, {
       scrollY: scrollRef.current,
       mouseX: mouseX.current,
       mouseY: mouseY.current,
-      viewportW: Math.max(1, Math.floor(rect.width)),
-      viewportH: Math.max(1, Math.floor(rect.height)),
+      viewportW: vw,
+      viewportH: vh,
     });
     if (scrollFade && containerRef.current) {
       // subtle opacity drop with scroll (down to ~0.8)
@@ -138,17 +186,27 @@ export default function DigitalWaveBackground(props: DigitalWaveBackgroundProps)
     const r = rendererRef.current;
     if (!el || !r || typeof ResizeObserver === 'undefined') return;
     const ro = new ResizeObserver(() => {
-      r.resize();
+      if (isFadingOut) return; // freeze during fade
+      const rect = el.getBoundingClientRect();
+      const w = Math.floor(rect.width);
+      const h = Math.floor(rect.height);
+      const prevStable = lastStableRef.current;
+      const collapsed = h < 32 || w < 32 || (prevStable.h > 0 && h < prevStable.h * 0.6);
+      if (!collapsed) {
+        lastStableRef.current = { w, h };
+        r.resize();
+      }
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [isFadingOut]);
 
   return (
     <div
       ref={containerRef}
       className={[
-        "wave-fade pointer-events-none absolute inset-0 overflow-hidden",
+        "wave-fade",
+        "pointer-events-none absolute inset-0 overflow-hidden",
         // z-0 by default; ensure parent provides stacking context
         className
       ].join(' ')}

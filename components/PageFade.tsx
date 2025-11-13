@@ -74,6 +74,27 @@ export default function PageFade({ children }: Props) {
 
   const wrapperClass = `section ${fadeCtx && fadeCtx.isFadingOut ? 'fade-out' : 'fade-in'}`;
 
+  // Prevent parent collapse during fade-out to keep sibling absolute layers (e.g., background)
+  // from flickering due to height going to zero.
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const parent = el.parentElement; // this is the `.relative` container in layout
+    if (!parent) return;
+    if (fadeCtx && fadeCtx.isFadingOut) {
+      const h = el.getBoundingClientRect().height;
+      if (h > 0) {
+        parent.style.minHeight = `${Math.floor(h)}px`;
+      }
+    } else {
+      parent.style.minHeight = '';
+    }
+    return () => {
+      // clear on unmount just in case
+      if (parent) parent.style.minHeight = '';
+    };
+  }, [fadeCtx && fadeCtx.isFadingOut]);
+
   return (
     // key the element by pathname so it remounts on route change
     <div key={pathname} ref={wrapperRef} className={wrapperClass} style={inlineStyles}>
