@@ -46,10 +46,10 @@ export default function HomePage() {
         <section className="card">
           <h2 className="section-title text-xl mb-2">Current Focus</h2>
           <p className="text-sm text-slate-700">
-            Designing hybrid mechanistic–machine learning models for genetic
+            Designing hybrid mechanistic-machine learning models for genetic
             circuits, advancing software tools in the Genetic Logic Lab at CU Boulder, and
-            deepening my knowledge of applied math with a focus on dynamical systems and modeling
-            with an emphasis on machine learning and data science through my graduate studies.
+            deepening my knowledge of applied math, emphasizing dynamical systems & modeling
+            as well as machine learning & data science through my graduate studies.
           </p>
         </section>
 
