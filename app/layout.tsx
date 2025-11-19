@@ -26,6 +26,17 @@ export const metadata: Metadata = {
   authors: [{ name: "Zane Perry", url: "https://zane-perry.com" }],
   creator: "Zane Perry",
   publisher: "Zane Perry",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1
+    }
+  },
   alternates: {
     canonical: "https://zane-perry.com"
   },
@@ -36,6 +47,7 @@ export const metadata: Metadata = {
     title: "Zane Perry — Applied Math & ML",
     description:
       "Portfolio and research site for Zane Perry — applied mathematics, machine learning, and software engineering.",
+    locale: "en_US",
     images: [
       {
         url: "/homepage.avif",
@@ -51,6 +63,9 @@ export const metadata: Metadata = {
     description:
       "Portfolio and research site for Zane Perry — applied mathematics, machine learning, and software engineering.",
     images: ["/homepage.avif"]
+  },
+  verification: {
+    google: "fvbnfmBIQn9txuszDP_rwAQT9zsA59Pb_TTfErmZ9U8"
   }
 };
 
@@ -67,9 +82,6 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" />
         <link rel="shortcut icon" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/favicon.svg" />
-  {/* Google Search Console site verification */}
-  <meta name="google-site-verification" content="fvbnfmBIQn9txuszDP_rwAQT9zsA59Pb_TTfErmZ9U8" />
-
   {/* Person JSON-LD to help search engines associate the site with the person */}
         <script
           type="application/ld+json"
@@ -82,14 +94,45 @@ export default function RootLayout({
               url: "https://zane-perry.com",
               sameAs: [
                 "https://github.com/zane-perry",
-                "https://www.linkedin.com/in/zane-perry/"
-                // Add more profiles as available, e.g. LinkedIn, X/Twitter
-                // "https://www.linkedin.com/in/<your-handle>",
-                // "https://twitter.com/<your-handle>"
+                "https://www.linkedin.com/in/zane-perry"
               ],
               jobTitle: "Applied Mathematics & Machine Learning",
+              image: "https://zane-perry.com/headshot.JPG",
+              email: "mailto:Zane.L.Perry@gmail.com",
+              alumniOf: {
+                "@type": "CollegeOrUniversity",
+                name: "University of Colorado Boulder",
+                sameAs: "https://www.colorado.edu/"
+              },
+              knowsAbout: [
+                "Applied Mathematics",
+                "Machine Learning",
+                "Numerical Methods",
+                "Dynamical Systems",
+                "Genetic Circuits",
+                "Data Science",
+                "Software Engineering"
+              ],
               description:
                 "Portfolio and research site for Zane Perry — applied mathematics, machine learning, and software engineering."
+            })
+          }}
+        />
+        {/* Optional WebSite JSON-LD to reinforce site association */}
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Zane Perry",
+              url: "https://zane-perry.com",
+              publisher: {
+                "@type": "Person",
+                name: "Zane Perry",
+                url: "https://zane-perry.com"
+              }
             })
           }}
         />
