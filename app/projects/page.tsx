@@ -35,6 +35,13 @@ const projects = [
     status: "Presentation, Report, Code available"
   },
   {
+    title: "Turing Instabilities and Ohta–Kawasaki Phase Separation",
+    role: "Applied Math / Dynamical Systems",
+    summary: "A comparative study of reaction–diffusion (Brusselator) and phase-separation (Ohta–Kawasaki) models for biological morphogenesis.",
+    tags: ["PDEs", "Dynamics", "Numerical Simulation", "Stability Analysis"],
+    status: "Presentation, Report available"
+  },
+  {
     title: "Airfoil Fluid Simulation",
     role: "Simulation / Real Data",
     summary: "Computational fluid dynamics simulations for airfoil design and analysis.",

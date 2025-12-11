@@ -7,6 +7,7 @@ import { signalNoiseReducer } from "./signal-noise-reducer";
 import { travelGuide } from "./travel-guide";
 import { imageCompressor } from "./image-compressor";
 import { minigit } from "./minigit";
+import { morphogenesis } from "./morphogenesis";
 
 export const projectDetailsMap: Record<string, import("./types").ProjectDetail> = {
   "AI Assisted Rapid Prototyper": aiAssistedRapidPrototyper,
@@ -17,6 +18,7 @@ export const projectDetailsMap: Record<string, import("./types").ProjectDetail> 
   "Travel Planning Guide": travelGuide,
   "Image Compressor": imageCompressor,
   "Minigit File Version Control": minigit,
+  "Turing Instabilities and Ohta–Kawasaki Phase Separation": morphogenesis,
 };
 
 export {
@@ -28,4 +30,5 @@ export {
   travelGuide,
   imageCompressor,
   minigit,
+  morphogenesis,
 };
