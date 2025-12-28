@@ -15,14 +15,14 @@ export default function ResumePage() {
 
         <div className="mt-4 flex gap-3">
           <a
-            href="/Resume.pdf"
+            href="/Zane_Perry_Resume.pdf"
             download
             className="rounded bg-slate-100 px-3 py-1 text-sm"
           >
             Download PDF
           </a>
           <a
-            href="/Resume.pdf"
+            href="/Zane_Perry_Resume.pdf"
             target="_blank"
             rel="noreferrer"
             className="rounded border border-slate-200 px-3 py-1 text-sm"
@@ -33,7 +33,7 @@ export default function ResumePage() {
 
         <div className="mt-6">
           <iframe
-            src="/Resume.pdf"
+            src="/Zane_Perry_Resume.pdf"
             title="Resume PDF"
             className="w-full h-[700px] border rounded-md"
           />
