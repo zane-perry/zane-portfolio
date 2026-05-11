@@ -8,6 +8,9 @@ import { travelGuide } from "./travel-guide";
 import { imageCompressor } from "./image-compressor";
 import { minigit } from "./minigit";
 import { morphogenesis } from "./morphogenesis";
+import { bayesianBlastAnalysis } from "./bayesian-blast-analysis";
+import { spiralWaveDefibrillation } from "./spiral-wave-defibrillation";
+import { pinnConstraintEncoding } from "./pinn-constraint-encoding";
 
 export const projectDetailsMap: Record<string, import("./types").ProjectDetail> = {
   "AI Assisted Rapid Prototyper": aiAssistedRapidPrototyper,
@@ -15,6 +18,9 @@ export const projectDetailsMap: Record<string, import("./types").ProjectDetail> 
   "Boundary Integral Equation ODE/PDE Solver": boundarySolver,
   "Airfoil Fluid Simulation": airfoilSim,
   "Signal Noise Reducer": signalNoiseReducer,
+  "Constraint Encoding in Physics-Informed Neural Networks for PDE Solvers": pinnConstraintEncoding,
+  "Bayesian Interpretation of BLAST Evidence for Biological Sequence Matching": bayesianBlastAnalysis,
+  "Spiral Wave Dynamics and Low-Energy Defibrillation in Excitable Media": spiralWaveDefibrillation,
   "Travel Planning Guide": travelGuide,
   "Image Compressor": imageCompressor,
   "Minigit File Version Control": minigit,
@@ -27,6 +33,9 @@ export {
   boundarySolver,
   airfoilSim,
   signalNoiseReducer,
+  pinnConstraintEncoding,
+  bayesianBlastAnalysis,
+  spiralWaveDefibrillation,
   travelGuide,
   imageCompressor,
   minigit,

@@ -7,11 +7,25 @@ import FilePreview from "../../components/FilePreview";
 
 const projects = [
   {
-    title: "AI Assisted Rapid Prototyper",
-    role: "Senior Capstone Project",
-    summary: "LLM-driven scaffolding tool for rapid prototyping of full-stack applications.",
-    tags: ["LLM", "Full Stack", "Group Project", "API", "Agile/Scrum"],
-    status: "Poster, Presentation, Documentation available"
+    title: "Constraint Encoding in Physics-Informed Neural Networks for PDE Solvers",
+    role: "Independent Research Project",
+    summary: "Structure-aware PINN methods that encode admissibility, variational principles, entropy conditions, and comparison principles for PDE classes.",
+    tags: ["PINNs", "Scientific Machine Learning", "PDEs", "PyTorch"],
+    status: "Presentation, Report, Code available"
+  },
+  {
+    title: "Spiral Wave Dynamics and Low-Energy Defibrillation in Excitable Media",
+    role: "Collaborative Computational Biology Research",
+    summary: "FitzHugh-Nagumo reaction-diffusion simulations and contour-guided interventions for low-energy topological defibrillation.",
+    tags: ["Reaction-Diffusion", "Computational Biology", "PDE Simulation", "Topological Control"],
+    status: "Report, Code available"
+  },
+  {
+    title: "Bayesian Interpretation of BLAST Evidence for Biological Sequence Matching",
+    role: "Individual Research Project",
+    summary: "Bayesian reinterpretation of BLAST evidence to estimate posterior support for sequence homology and species matching.",
+    tags: ["Computational Biology", "Bayesian Inference", "MCMC", "Bioinformatics"],
+    status: "Presentation, Report, Code available"
   },
   {
     title: "Advanced Music Recommendation using Deep Learning",
@@ -19,6 +33,13 @@ const projects = [
     summary: "Multi-modal deep learning recommender combining audio signal features and user data.",
     tags: ["PyTorch", "Digital Signal Processing", "ML Design"],
     status: "Poster, Presentation, Report, Code available"
+  },
+  {
+    title: "AI Assisted Rapid Prototyper",
+    role: "Senior Capstone Project",
+    summary: "LLM-driven scaffolding tool for rapid prototyping of full-stack applications.",
+    tags: ["LLM", "Full Stack", "Group Project", "API", "Agile/Scrum"],
+    status: "Poster, Presentation, Documentation available"
   },
   {
     title: "Boundary Integral Equation ODE/PDE Solver",
